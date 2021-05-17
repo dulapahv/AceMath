@@ -9,5 +9,3 @@ You MUST run these commands in terminal first!
 3. pip install stopwatch.py
 
 To launch the game, simply compile Main.py. Go to getting_started-AceMath.pdf and documentation-AceMath.pdf to learn more about this game!
-
-"Immerse yourself into a challenging world of mathematics. Solve the problems as fast as you can to earn yourself a new record. 4 Difficulties are available for people who seek even more challenges with up to 40 questions in a single game. Play the game anytime, anywhere you want with the sync features, making sure that you will be able to earn a new record at your will."
