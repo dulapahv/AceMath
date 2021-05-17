@@ -1,5 +1,5 @@
 # AceMath
-A speed math puzzle game with integrated cloud-based user account system
+A speed math puzzle game with an integrated cloud-based user account system feature
 
 Download the game at AceMath_by_n0miya.zip or https://drive.google.com/file/d/1le9mvw0xnNOfK3qpaWOid894Osc4gVc7/view?usp=sharing
 
