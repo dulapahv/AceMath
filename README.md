@@ -8,4 +8,4 @@ You MUST run these commands in terminal first!
 2. pip install firebase-admin
 3. pip install stopwatch.py
 
-To launch the game, simply compile Main.py. You can go to getting_started-AceMath.pdf and documentation-AceMath.pdf to learn more about this game!
+To launch the game, simply compile Main.py. You can also go to getting_started-AceMath.pdf and documentation-AceMath.pdf to learn more about this game!
