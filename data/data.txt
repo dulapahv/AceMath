@@ -1,81 +1,81 @@
-Written by n0miya (Dulapah Vibulsanti) connected_to_firebase
+isFirebaseConnected
 0
 
-user_connected
+firebaseUsername
 null
 
-is_user_in_credential_screen
-0
+isUserInCredentialScreen
+False
 
-difficulty
+selectedDifficulty
 Easy
 
-question_size
+questionSize
 9
 
-integer_size
+integerSize
 1
 
-is_game_started
+isGameStarted
 0
 
-stopwatch_pause
-0
+isStopwatchPaused
+False
 
-is_user_in_the_game
-0
+isUserInGame
+False
 
-question_number
+currentQuestionNumber
 0
 
 answer
-6
+8
 
-min_integer
+minInteger
 0
 
-max_integer
+maxInteger
 9
 
 
 ### ORIGINAL DATA ###
-connected_to_firebase
+isFirebaseConnected
 0
 
-user_connected
+firebaseUsername
 null
 
-is_user_in_credential_screen
-0
+isUserInCredentialScreen
+False
 
-difficulty
+selectedDifficulty
 null
 
-question_size
+questionSize
 0
 
-integer_size
+integerSize
 0
 
-is_game_started
+isGameStarted
 0
 
-stopwatch_pause
-0
+isStopwatchPaused
+False
 
-is_user_in_the_game
-0
+isUserInGame
+False
 
-question_number
+currentQuestionNumber
 0
 
 answer
 0
 
-min_integer
+minInteger
 0
 
-max_integer
+maxInteger
 0
 
 ### END ###

@@ -1,22 +1,133 @@
-# Written by n0miya (Dulapah Vibulsanti)
-#
-# Please run these commands in terminal!
-# pip install Pillow
-# pip install firebase-admin
-# pip install stopwatch.py
+#=============================================#
+# Written by Dulapah Vibulsanti (64011388)    #
+#                                             #
+# Please run these commands in terminal!      #
+# pip install Pillow                          #
+# pip install firebase-admin                  #
+# pip install stopwatch.py                    #
+#=============================================#
 import tkinter
 import random
 import winsound
 from tkinter import font
 from tkinter import *
 from PIL import ImageTk, Image
-from data.Functions import *  # Firebase included
 from stopwatch import Stopwatch  # https://pypi.org/project/stopwatch.py/
+from firebase_admin import credentials, db
+import firebase_admin
+
+SCREEN_RESOLUTION = "1920x1080"
+
 
 stopwatch = Stopwatch()  # Initialize stopwatch variable
 
 
-# Enable/Disable fullscreen when user presses F11 key
+# Authenticate Firebase database
+cred = credentials.Certificate('data/acemath-n0miya-firebase-adminsdk-yft0t-e8061fb0b1.json')
+firebase_admin.initialize_app(cred, {
+    'databaseURL': 'https://acemath-n0miya-default-rtdb.asia-southeast1.firebasedatabase.app/'
+})
+
+
+# Create new user in Firebase database
+def create_new_user(user_name, user_password):
+    user = db.reference('Users')
+    user.child(user_name).set({
+        'Key': user_password,
+        'Gender': 0,
+        'TimesPlayed': {
+            'Easy': 0,
+            'Normal': 0,
+            'Hard': 0,
+            'Expert': 0,
+        },
+        'FastestTime': {
+            'Easy': "00.00s",
+            'Normal': "00.00s",
+            'Hard': "00.00s",
+            'Expert': "00.00s",
+            'EasyValue': 999999999,
+            'NormalValue': 999999999,
+            'HardValue': 999999999,
+            'ExpertValue': 999999999,
+        }
+    })
+
+
+# Write data to Firebase database
+def write_to_firebase(user_name, child, data):
+    user = db.reference('Users')
+    user.child(user_name).update({
+        child: data,
+    })
+
+
+# Get sum of TimesPlayed of user
+def sum_times_played(user_name):
+    easy = db.reference('Users/' + str(user_name) + '/TimesPlayed/Easy').get()
+    normal = db.reference('Users/' + str(user_name) + '/TimesPlayed/Normal').get()
+    hard = db.reference('Users/' + str(user_name) + '/TimesPlayed/Hard').get()
+    expert = db.reference('Users/' + str(user_name) + '/TimesPlayed/Expert').get()
+    sum_played = easy + normal + hard + expert
+    return str(sum_played)
+
+
+def search_string_in_file(file_name, string_to_search):
+    line_number = 0
+    list_of_results = []
+    # Open the file in read only mode
+    with open(file_name, 'r') as read_obj:
+        # Read all lines in the file one by one
+        for line in read_obj:
+            # For each line, check if line contains the string
+            line_number += 1
+            if string_to_search in line:
+                # If yes, then add the line number & line as a tuple in the list
+                list_of_results.append((line_number, line.rstrip()))
+    # Return list of tuples containing line numbers and lines where string is found
+    return list_of_results
+
+
+# Read data from data.txt
+def read_data(line):
+    file = open('data/data.txt', "r")
+    content = file.readlines()
+    data = (content[line])
+    file.close()
+    return data.rstrip('\n')
+
+
+# Write data to data.txt
+def write_data(line, data):
+    file = open('data/data.txt', "r")
+    content = file.readlines()
+    content[line] = str(data) + "\n"
+    file = open("data/data.txt", "w")
+    file.writelines(content)
+    file.close()
+
+
+# Hide canvas
+def hide_canvas(canvas):
+    canvas.pack_forget()
+
+
+# Show canvas
+def show_canvas(canvas):
+    canvas.pack()
+
+
+# Hide widget
+def hide_widget(widget):
+    widget.place_forget()
+
+
+# Show widget
+def show_widget(widget, x_coordinate, y_coordinate):
+    widget.place(x=x_coordinate, y=y_coordinate)
+
+
+# Toggle fullscreen when user presses F11 key
 def fullscreen(event):
     if not MainWindow.attributes('-fullscreen'):
         MainWindow.attributes('-fullscreen', True)
@@ -41,9 +152,9 @@ def out_main_menu():
 
 # Show/Hide widgets and canvases when user moves to MainMenu
 def to_main_menu(event):
-    if read_data(25) == "1":
+    if read_data(25) == "True":  # isUserInGame
         stopwatch.stop()
-        write_data(22, 1)
+        write_data(22, "True")  # isStopwatchPaused
         show_widget(account_prompt, 500, 380)
         show_widget(cancel_game, 550, 480)
         show_widget(cancel_game_yes, 700, 683)
@@ -101,10 +212,10 @@ def back_auth(event):
     show_widget(login_button, 1015, 683)
     show_widget(account_text, 520, 400)
     show_widget(back_button, 80, 20)
-    username.delete(0, 'end')
+    username.delete(0, 'end')  # clear entered field
     password.delete(0, 'end')
     password_confirm.delete(0, 'end')
-    write_data(7, 0)
+    write_data(7, "False")  # isUserInCredentialScreen
 
 
 # When user presses Play button
@@ -213,7 +324,7 @@ def play_offline(event):
 
 # If user selects register account
 def create_account(event):
-    if int(read_data(7)) == 0:
+    if read_data(7) == "False":  # isUserInCredentialScreen
         hide_widget(offline_button)
         hide_widget(login_button)
         hide_widget(account_text)
@@ -224,7 +335,7 @@ def create_account(event):
         show_widget(username, 900, 470)
         show_widget(password, 900, 535)
         show_widget(password_confirm, 900, 602)
-        write_data(7, 1)
+        write_data(7, "True")  # isUserInCredentialScreen
     else:
         # Check login credential
         show_widget(auth_message, 520, 683)
@@ -242,7 +353,7 @@ def create_account(event):
 
 # If user selects login account
 def login_account(event):
-    if int(read_data(7)) == 0:
+    if read_data(7) == "False":  # isUserInCredentialScreen
         hide_widget(offline_button)
         hide_widget(create_button)
         hide_widget(account_text)
@@ -252,7 +363,7 @@ def login_account(event):
         show_widget(back_auth_button, 520, 400)
         show_widget(username, 820, 520)
         show_widget(password, 820, 585)
-        write_data(7, 1)
+        write_data(7, "True")  # isUserInCredentialScreen
     else:
         # Check login credential
         show_widget(auth_message, 520, 683)
@@ -273,7 +384,7 @@ def login_account(event):
             hide_widget(password)
             show_widget(ok_button, 860, 683)
             show_widget(login_success, 800, 420)
-            write_data(7, 0)
+            write_data(7, "False")  # isUserInCredentialScreen
             login_success.config(text="Login successful! \n\n  Username : " + username.get() +
                                       "\nHave a nice day!", fg="green")
             username.delete(0, 'end')
@@ -332,8 +443,8 @@ def prompt_exit(event):
     hide_widget(cancel_game)
     hide_widget(cancel_game_yes)
     hide_widget(cancel_game_no)
-    write_data(25, 0)
-    write_data(22, 0)
+    write_data(25, "False")  # isUserInGame
+    write_data(22, "False")  # isStopwatchPaused
     write_data(19, 0)
     winsound.PlaySound('data/sounds/BGMusic.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
     to_main_menu(event)
@@ -353,7 +464,7 @@ def prompt_exit_cancel(event):
         user_answer.config(state='normal')
     else:
         show_widget(pre_countdown, 580, 520)
-    write_data(22, 0)
+    write_data(22, "False")  # isStopwatchPaused
     stopwatch.start()
 
 
@@ -394,13 +505,13 @@ def countdown_timer(t):
     winsound.PlaySound(None, winsound.SND_PURGE)
     show_widget(pre_countdown, 580, 520)
     while t >= 0:
-        if read_data(22) == "0":
+        if read_data(22) == "False":  # isStopwatchPaused
             MainWindow.after(1000)
             pre_countdown.config(text="Game will start in " + str(t) + " seconds!\nPress 'ENTER' to submit answer",
                                  fg="black")
             t -= 1
         MainWindow.update()  # Prevent Tkinter from locking up
-    if read_data(22) == "0":
+    if read_data(22) == "False":  # isStopwatchPaused
         stopwatch.restart()
         user_answer.config(state='normal')
         show_widget(back_button, 80, 20)
@@ -416,7 +527,7 @@ def start_game():
     hide_widget(hard_difficulty_button)
     hide_widget(expert_difficulty_button)
     hide_widget(back_button)
-    write_data(25, 1)
+    write_data(25, "True")
     write_data(28, 0)
     countdown_timer(5)
     summon_question()
@@ -463,7 +574,7 @@ def summon_integer():
         winsound.PlaySound('data/sounds/GameFinish.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
         hide_widget(back_button)
         write_data(28, 0)
-        write_data(25, 0)
+        write_data(25, "False")
         write_data(19, 0)
         show_widget(finish_game, 840, 770)
         show_widget(pre_countdown, 420, 450)
@@ -520,10 +631,10 @@ MainWindow.wm_iconbitmap('data/images/AceMath.ico')
 MainWindow.bind('<F11>', fullscreen)
 MainWindow.bind('<Escape>', close_confirmation)
 winsound.PlaySound('data/sounds/BGMusic.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
-write_data(7, 0)
+write_data(7, "False")  # isUserInCredentialScreen
 write_data(19, 0)
-write_data(22, 0)
-write_data(25, 0)
+write_data(22, "False")  # isStopwatchPaused
+write_data(25, "False")
 write_data(28, 0)
 
 
