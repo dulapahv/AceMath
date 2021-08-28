@@ -132,60 +132,38 @@ def out_main_menu():
 def to_main_menu(event):
     if read_data("isUserInGame") == "True":
         stopwatch.stop()
+        hideWidgetList = [pre_countdown, rand_int_text, user_answer]
+        for widget in hideWidgetList:
+            hide_widget(widget)
         write_data("isStopwatchPaused", "True")
         show_widget(account_prompt, 500, 380)
         show_widget(cancel_game, 550, 480)
         show_widget(cancel_game_yes, 700, 683)
         show_widget(cancel_game_no, 1015, 683)
-        hide_widget(pre_countdown)
-        hide_widget(rand_int_text)
-        hide_widget(user_answer)
         user_answer.config(state = "disabled")
         hide_widget(diag_box)
     else:
-        hide_widget(go_to_sync)
-        hide_widget(sync_prompt)
-        hide_widget(offline_button)
-        hide_widget(back_button)
-        hide_widget(account_prompt)
-        hide_widget(account_text)
-        hide_widget(offline_button)
-        hide_widget(create_button)
-        hide_widget(login_button)
-        hide_widget(logout_prompt)
-        hide_widget(logout_button)
-        hide_widget(cancel_logout_button)
-        hide_widget(diag_box)
-        hide_widget(profile_name)
-        hide_widget(profile_stat)
-        hide_widget(profile_stat_game)
-        hide_widget(male_profile_pic)
-        hide_widget(female_profile_pic)
-        hide_widget(change_gender_button)
-        hide_widget(select_difficulty)
-        hide_widget(easy_difficulty_button)
-        hide_widget(normal_difficulty_button)
-        hide_widget(hard_difficulty_button)
-        hide_widget(expert_difficulty_button)
+        hideWidgetList = [go_to_sync, sync_prompt, offline_button, back_button, account_prompt, account_text, offline_button, create_button,
+                        login_button, logout_prompt, logout_button, cancel_logout_button, diag_box, profile_name, profile_stat, profile_stat_game,
+                        male_profile_pic, female_profile_pic, change_gender_button, select_difficulty, easy_difficulty_button, normal_difficulty_button,
+                        hard_difficulty_button, expert_difficulty_button]
+        for widget in hideWidgetList:
+            hide_widget(widget)
         show_widget(play_button, 80, 425)
         show_widget(sync_button, 80, 558)
         show_widget(profile_button, 80, 690)
         show_widget(about_button, 80, 810)
         show_widget(exit_button, 80, 923)
         hide_canvas(BGCanvas)
-        show_canvas(BGFullCanvas)
         hide_canvas(AboutCanvas)
+        show_canvas(BGFullCanvas)   
 
 
 # If user press Back button in Auth
 def back_auth(event):
-    hide_widget(login_auth)
-    hide_widget(back_auth_button)
-    hide_widget(auth_message)
-    hide_widget(username)
-    hide_widget(password)
-    hide_widget(create_acc)
-    hide_widget(password_confirm)
+    hideWidgetList = [login_auth, back_auth_button, auth_message, username, password, create_acc, password_confirm]
+    for widget in hideWidgetList:
+        hide_widget(widget)
     show_widget(create_button, 700, 683)
     show_widget(login_button, 1015, 683)
     show_widget(account_text, 520, 400)
@@ -214,9 +192,9 @@ def sync(event):
     out_main_menu()
     # Prompt user to choose whether they want to create an account, connect to existing account, or play offline
     if read_data("isFirebaseConnected") == "False":
-        hide_widget(go_to_sync)
-        hide_widget(sync_prompt)
-        hide_widget(offline_button)
+        hideWidgetList = [go_to_sync, sync_prompt, offline_button]
+        for widget in hideWidgetList:
+            hide_widget(widget)
         show_widget(account_prompt, 500, 380)
         show_widget(account_text, 520, 400)
         show_widget(create_button, 700, 683)
@@ -299,10 +277,9 @@ def play_offline(event):
 # If user selects register account
 def create_account(event):
     if read_data("isUserInCredentialScreen") == "False":
-        hide_widget(offline_button)
-        hide_widget(login_button)
-        hide_widget(account_text)
-        hide_widget(back_button)
+        hideWidgetList = [offline_button, login_button, account_text, back_button]
+        for widget in hideWidgetList:
+            hide_widget(widget)
         show_widget(create_button, 1188, 683)
         show_widget(create_acc, 520, 470)
         show_widget(back_auth_button, 520, 400)
@@ -328,10 +305,9 @@ def create_account(event):
 # If user selects login account
 def login_account(event):
     if read_data("isUserInCredentialScreen") == "False":
-        hide_widget(offline_button)
-        hide_widget(create_button)
-        hide_widget(account_text)
-        hide_widget(back_button)
+        hideWidgetList = [offline_button, create_button, account_text, back_button]
+        for widget in hideWidgetList:
+            hide_widget(widget)
         show_widget(login_button, 1188, 683)
         show_widget(login_auth, 590, 520)
         show_widget(back_auth_button, 520, 400)
@@ -348,14 +324,11 @@ def login_account(event):
         elif user.get() == "None" or key.get() != password.get():
             auth_message.config(text="Username or password is incorrect. Try again.", fg = "red")
         else:
+            hideWidgetList = [auth_message, login_button, login_auth, back_auth_button, username, password]
+            for widget in hideWidgetList:
+                hide_widget(widget)
             write_data("isFirebaseConnected", "True")
             write_data("firebaseUsername", username.get())
-            hide_widget(auth_message)
-            hide_widget(login_button)
-            hide_widget(login_auth)
-            hide_widget(back_auth_button)
-            hide_widget(username)
-            hide_widget(password)
             show_widget(ok_button, 860, 683)
             show_widget(login_success, 800, 420)
             write_data("isUserInCredentialScreen", "False") 
@@ -374,10 +347,9 @@ def logout(event):
 
 # When user press Ok
 def ok(event):
-    hide_widget(ok_button)
-    hide_widget(no_sync)
-    hide_widget(account_prompt)
-    hide_widget(login_success)
+    hideWidgetList = [ok_button, no_sync, account_prompt, login_success]
+    for widget in hideWidgetList:
+        hide_widget(widget)
     to_main_menu(event)
 
 
@@ -395,9 +367,9 @@ def change_gender(event):
 
 # Prompt user to select difficulty
 def difficulty_select(event):
-    hide_widget(account_prompt)
-    hide_widget(sync_prompt)
-    hide_widget(go_to_sync)
+    hideWidgetList = [account_prompt, sync_prompt, go_to_sync]
+    for widget in hideWidgetList:
+        hide_widget(widget)
     hide_widget(offline_button)
     show_widget(diag_box, 227, 200)
     show_widget(select_difficulty, 289, 254)
@@ -409,14 +381,9 @@ def difficulty_select(event):
 
 # When user want to go to MainMenu while game is in progress
 def prompt_exit(event):
-    hide_widget(diag_box)
-    hide_widget(pre_countdown)
-    hide_widget(user_answer)
-    hide_widget(rand_int_text)
-    hide_widget(account_prompt)
-    hide_widget(cancel_game)
-    hide_widget(cancel_game_yes)
-    hide_widget(cancel_game_no)
+    hideWidgetList = [diag_box, pre_countdown, user_answer, rand_int_text, account_prompt, cancel_game, cancel_game_yes, cancel_game_no]
+    for widget in hideWidgetList:
+        hide_widget(widget)
     write_data("isUserInGame", "False")
     write_data("isStopwatchPaused", "False")
     write_data("isGameStarted", "False")
@@ -426,10 +393,9 @@ def prompt_exit(event):
 
 # When user decline to go to MainMenu while game is in progress
 def prompt_exit_cancel(event):
-    hide_widget(account_prompt)
-    hide_widget(cancel_game)
-    hide_widget(cancel_game_yes)
-    hide_widget(cancel_game_no)
+    hideWidgetList = [account_prompt, cancel_game, cancel_game_yes, cancel_game_no]
+    for widget in hideWidgetList:
+        hide_widget(widget)
     show_widget(rand_int_text, 400, 350)
     show_widget(diag_box, 227, 200)
     if read_data("isGameStarted") == "True":
@@ -494,12 +460,9 @@ def countdown_timer(t):
 
 # Game start
 def start_game():
-    hide_widget(select_difficulty)
-    hide_widget(easy_difficulty_button)
-    hide_widget(normal_difficulty_button)
-    hide_widget(hard_difficulty_button)
-    hide_widget(expert_difficulty_button)
-    hide_widget(back_button)
+    hideWidgetList = [select_difficulty, easy_difficulty_button, normal_difficulty_button, hard_difficulty_button, expert_difficulty_button, back_button]
+    for widget in hideWidgetList:
+        hide_widget(widget)
     write_data("isUserInGame", "True")
     write_data("currentQuestionNumber", 0)
     countdown_timer(5)
@@ -543,9 +506,11 @@ def summon_integer():
         q_number_all_f = int(q_number_all) + 1
         pre_countdown.config(text = str(q_number_f) + "/" + str(q_number_all_f), anchor = "e")
     else:  # Game finishes
+        hideWidgetList = [back_button, rand_int_text, user_answer]
+        for widget in hideWidgetList:
+            hide_widget(widget)
         stopwatch.stop()
         winsound.PlaySound('data/sounds/GameFinish.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
-        hide_widget(back_button)
         write_data("currentQuestionNumber", 0)
         write_data("isUserInGame", "False")
         write_data("isGameStarted", "False")
@@ -553,8 +518,6 @@ def summon_integer():
         show_widget(pre_countdown, 420, 450)
         pre_countdown.config(text = "Your time is " + str(stopwatch) + "\nKeep on trying!")
         user_answer.delete(0, 'end')
-        hide_widget(rand_int_text)
-        hide_widget(user_answer)
         submit_score()
 
 
@@ -585,9 +548,9 @@ def submit_score():
 
 # Go back to MainMenu after game is finished
 def ok_result(event):
-    hide_widget(diag_box)
-    hide_widget(pre_countdown)
-    hide_widget(finish_game)
+    hideWidgetList = [diag_box, pre_countdown, finish_game]
+    for widget in hideWidgetList:
+        hide_widget(widget)
     winsound.PlaySound('data/sounds/BGMusic.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
     to_main_menu(event)
 
