@@ -9,18 +9,15 @@
 import tkinter
 import random
 import winsound
+import firebase_admin
 from tkinter import font
 from tkinter import *
 from PIL import ImageTk, Image
 from stopwatch import Stopwatch  # https://pypi.org/project/stopwatch.py/
 from firebase_admin import credentials, db
-import firebase_admin
-
-SCREEN_RESOLUTION = "1920x1080"
 
 
 stopwatch = Stopwatch()  # Initialize stopwatch variable
-
 
 # Authenticate Firebase database
 cred = credentials.Certificate('data/acemath-n0miya-firebase-adminsdk-yft0t-e8061fb0b1.json')
@@ -85,7 +82,7 @@ def read_data(string_to_search):
 # Search and replace value in data.txt
 def write_data(string_to_search, value):
     lineNumber = 0
-    with open("data/data.txt", 'r+') as read_obj:
+    with open("data/data.txt", 'r') as read_obj:
         filedata = read_obj.read()
         filedata = filedata.replace(string_to_search + " = " + read_data(string_to_search), string_to_search + " = " + str(value))
     with open("data/data.txt", 'w') as read_obj:
@@ -453,7 +450,7 @@ def prompt_exit_cancel(event):
 # If user select easy gamemode
 def easy_gamemode(event):
     write_data("selectedDifficulty", "Easy")
-    write_data("questionSize", 9)
+    write_data("questionSize", 19)
     write_data("integerSize", 1)
     start_game()
 
@@ -469,7 +466,7 @@ def normal_gamemode(event):
 # If user select hard gamemode
 def hard_gamemode(event):
     write_data("selectedDifficulty", "Hard")
-    write_data("questionSize", 29)
+    write_data("questionSize", 19)
     write_data("integerSize", 3)
     start_game()
 
@@ -477,7 +474,7 @@ def hard_gamemode(event):
 # If user select expert gamemode
 def expert_gamemode(event):
     write_data("selectedDifficulty", "Expert")
-    write_data("questionSize", 39)
+    write_data("questionSize", 19)
     write_data("integerSize", 4)
     start_game()
 
