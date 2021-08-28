@@ -110,7 +110,7 @@ def hide_widget(widget):
 
 # Show widget
 def show_widget(widget, x_coordinate, y_coordinate):
-    widget.place(x=x_coordinate, y=y_coordinate)
+    widget.place(x = x_coordinate, y = y_coordinate)
 
 
 # Toggle fullscreen when user presses F11 key
@@ -148,7 +148,7 @@ def to_main_menu(event):
         hide_widget(pre_countdown)
         hide_widget(rand_int_text)
         hide_widget(user_answer)
-        user_answer.config(state="disabled")
+        user_answer.config(state = "disabled")
         hide_widget(diag_box)
     else:
         hide_widget(go_to_sync)
@@ -322,15 +322,15 @@ def create_account(event):
         # Check login credential
         show_widget(auth_message, 520, 683)
         if username.get() == "" or password.get() == "" or password_confirm.get() == "":
-            auth_message.config(text="Please complete all required fields.", fg="red")
+            auth_message.config(text = "Please complete all required fields.", fg = "red")
         elif password.get() != password_confirm.get():
-            auth_message.config(text="Passwords did not match. Try again.", fg="red")
+            auth_message.config(text = "Passwords did not match. Try again.", fg = "red")
         elif str(db.reference('Users/' + username.get()).get()) != "None":
-            auth_message.config(text="This username is already taken.", fg="red")
+            auth_message.config(text = "This username is already taken.", fg = "red")
         else:
             create_new_user(username.get(), password.get())
             hide_widget(create_button)
-            auth_message.config(text="Account created successfully. Please go back and click on Login.", fg="green")
+            auth_message.config(text="Account created successfully. Please go back and click on Login.", fg = "green")
 
 
 # If user selects login account
@@ -352,9 +352,9 @@ def login_account(event):
         user = db.reference('Users/' + username.get())
         key = db.reference('Users/' + username.get() + '/Key')
         if username.get() == "" or password.get() == "":
-            auth_message.config(text="Please complete all required fields.", fg="red")
+            auth_message.config(text="Please complete all required fields.", fg = "red")
         elif user.get() == "None" or key.get() != password.get():
-            auth_message.config(text="Username or password is incorrect. Try again.", fg="red")
+            auth_message.config(text="Username or password is incorrect. Try again.", fg = "red")
         else:
             write_data("isFirebaseConnected", "True")
             write_data("firebaseUsername", username.get())
@@ -367,8 +367,7 @@ def login_account(event):
             show_widget(ok_button, 860, 683)
             show_widget(login_success, 800, 420)
             write_data("isUserInCredentialScreen", "False") 
-            login_success.config(text="Login successful! \n\n  Username : " + username.get() +
-                                      "\nHave a nice day!", fg="green")
+            login_success.config(text = "Login successful! \n\n  Username : " + username.get() + "\nHave a nice day!", fg = "green")
             username.delete(0, 'end')
             password.delete(0, 'end')
 
@@ -444,7 +443,7 @@ def prompt_exit_cancel(event):
     if read_data("isGameStarted") == "True":
         show_widget(user_answer, 670, 750)
         show_widget(pre_countdown, 900, 215)
-        user_answer.config(state='normal')
+        user_answer.config(state = 'normal')
     else:
         show_widget(pre_countdown, 580, 520)
     write_data("isStopwatchPaused", "False") 
@@ -490,12 +489,12 @@ def countdown_timer(t):
     while t >= 0:
         if read_data("isStopwatchPaused") == "False":
             MainWindow.after(1000)
-            pre_countdown.config(text="Game will start in " + str(t) + " seconds!\nPress 'ENTER' to submit answer", fg="black")
+            pre_countdown.config(text = "Game will start in " + str(t) + " seconds!\nPress 'ENTER' to submit answer", fg = "black")
             t -= 1
         MainWindow.update()  # Prevent Tkinter from locking up
     if read_data("isStopwatchPaused") == "False":
         stopwatch.restart()
-        user_answer.config(state='normal')
+        user_answer.config(state = 'normal')
         show_widget(back_button, 80, 20)
         write_data("isGameStarted", "True")
         winsound.PlaySound('data/sounds/GameStart.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
@@ -543,14 +542,14 @@ def summon_integer():
         max_integer = int(read_data("maxInteger"))
         int1 = random.randint(min_integer, max_integer)
         int2 = random.randint(min_integer, max_integer)
-        rand_int_text.config(text=str(int1) + " + " + str(int2))
+        rand_int_text.config(text = str(int1) + " + " + str(int2))
         write_data("answer", int1 + int2)
         show_widget(pre_countdown, 900, 215)
         q_number = read_data("currentQuestionNumber")
         q_number_f = int(q_number) + 1
         q_number_all = read_data("questionSize")
         q_number_all_f = int(q_number_all) + 1
-        pre_countdown.config(text=str(q_number_f) + "/" + str(q_number_all_f), anchor="e")
+        pre_countdown.config(text = str(q_number_f) + "/" + str(q_number_all_f), anchor = "e")
     else:  # Game finishes
         stopwatch.stop()
         winsound.PlaySound('data/sounds/GameFinish.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
@@ -560,7 +559,7 @@ def summon_integer():
         write_data("isGameStarted", "False")
         show_widget(finish_game, 840, 770)
         show_widget(pre_countdown, 420, 450)
-        pre_countdown.config(text="Your time is " + str(stopwatch) + "\nKeep on trying!")
+        pre_countdown.config(text = "Your time is " + str(stopwatch) + "\nKeep on trying!")
         user_answer.delete(0, 'end')
         hide_widget(rand_int_text)
         hide_widget(user_answer)
@@ -585,7 +584,7 @@ def submit_score():
         user.update({read_data("firebaseUsername") + '/TimesPlayed/' + read_data("selectedDifficulty"): played,})
         best_time_prev = db.reference('Users/' + read_data("firebaseUsername") + '/FastestTime/' + read_data("selectedDifficulty") + 'Value')
         if stopwatch.duration < best_time_prev.get():
-            pre_countdown.config(text="Congratulations!" + "\n" + "Your time is " + str(stopwatch) + "\nNew Record!", fg="green")
+            pre_countdown.config(text="Congratulations!" + "\n" + "Your time is " + str(stopwatch) + "\nNew Record!", fg = "green")
             user.update({
                 read_data("firebaseUsername") + '/FastestTime/' + read_data("selectedDifficulty"): str(stopwatch),
                 read_data("firebaseUsername") + '/FastestTime/' + read_data("selectedDifficulty") + 'Value': stopwatch.duration
@@ -621,273 +620,273 @@ write_data("currentQuestionNumber", 0)
 BGFullCanvas = Canvas(MainWindow, width=1920, height=1080)
 BGFullCanvas.pack()
 BGFull = ImageTk.PhotoImage(Image.open("data/images/BGFull.jpg"))
-BGFullCanvas.create_image(0, 0, anchor=NW, image=BGFull)
+BGFullCanvas.create_image(0, 0, anchor = NW, image = BGFull)
 
-BGCanvas = Canvas(MainWindow, width=1920, height=1080)
+BGCanvas = Canvas(MainWindow, width = 1920, height = 1080)
 BGCanvas.pack()
 BG = ImageTk.PhotoImage(Image.open("data/images/BG.jpg"))
-BGCanvas.create_image(0, 0, anchor=NW, image=BG)
+BGCanvas.create_image(0, 0, anchor = NW, image = BG)
 
 ### Play button ###
-PlayButtonBG = PhotoImage(file="data/images/Play.png")
-play_button = Button(MainWindow, width=274, height=109, image=PlayButtonBG, borderwidth=0)
-play_button.place(x=80, y=425)
+PlayButtonBG = PhotoImage(file = "data/images/Play.png")
+play_button = Button(MainWindow, width = 274, height = 109, image = PlayButtonBG, borderwidth = 0)
+play_button.place(x = 80, y = 425)
 play_button.bind('<Button-1>', play)
 
 ### Sync button ###
-SyncButtonBG = PhotoImage(file="data/images/Sync.png")
-sync_button = Button(MainWindow, width=276, height=107, image=SyncButtonBG, borderwidth=0)
-sync_button.place(x=80, y=558)
+SyncButtonBG = PhotoImage(file = "data/images/Sync.png")
+sync_button = Button(MainWindow, width = 276, height = 107, image = SyncButtonBG, borderwidth = 0)
+sync_button.place(x = 80, y = 558)
 sync_button.bind('<Button-1>', sync)
 
 ### Profile button ###
-ProfileButtonBG = PhotoImage(file="data/images/Profile.png")
-profile_button = Button(MainWindow, width=363, height=94, image=ProfileButtonBG, borderwidth=0)
-profile_button.place(x=80, y=690)
+ProfileButtonBG = PhotoImage(file = "data/images/Profile.png")
+profile_button = Button(MainWindow, width = 363, height = 94, image = ProfileButtonBG, borderwidth = 0)
+profile_button.place(x = 80, y = 690)
 profile_button.bind('<Button-1>', profile)
 
 ### About button ###
-AboutButtonBG = PhotoImage(file="data/images/About.png")
-about_button = Button(MainWindow, width=335, height=90, image=AboutButtonBG, borderwidth=0)
-about_button.place(x=80, y=810)
+AboutButtonBG = PhotoImage(file = "data/images/About.png")
+about_button = Button(MainWindow, width = 335, height = 90, image = AboutButtonBG, borderwidth = 0)
+about_button.place(x = 80, y = 810)
 about_button.bind('<Button-1>', about)
 
 ### Exit button ###
-ExitButtonBG = PhotoImage(file="data/images/Exit.png")
-exit_button = Button(MainWindow, width=252, height=87, image=ExitButtonBG, borderwidth=0)
-exit_button.place(x=80, y=923)
+ExitButtonBG = PhotoImage(file = "data/images/Exit.png")
+exit_button = Button(MainWindow, width = 252, height = 87, image = ExitButtonBG, borderwidth = 0)
+exit_button.place(x = 80, y = 923)
 exit_button.bind('<Button-1>', close_confirmation)
 
 ### Back button ###
 BackButtonBG = PhotoImage(file="data/images/Back.png")
-back_button = Button(MainWindow, width=314, height=95, image=BackButtonBG, borderwidth=0)
+back_button = Button(MainWindow, width = 314, height = 95, image = BackButtonBG, borderwidth = 0)
 back_button.bind('<Button-1>', to_main_menu)
 hide_widget(back_button)
 
 ### About description ###
-AboutCanvas = Canvas(MainWindow, width=1920, height=1080)
+AboutCanvas = Canvas(MainWindow, width = 1920, height = 1080)
 AboutCanvas.pack()
 About = ImageTk.PhotoImage(Image.open("data/images/AboutMe.jpg"))
-AboutCanvas.create_image(0, 0, anchor=NW, image=About)
+AboutCanvas.create_image(0, 0, anchor = NW, image = About)
 hide_canvas(AboutCanvas)
 
 ### Exit confirmation dialog ###
 ExitConfirmDiagBG = Image.open("data/images/ExitDiag.png")
 ExitConfirmBG = ImageTk.PhotoImage(ExitConfirmDiagBG)
-exit_confirm = tkinter.Label(image=ExitConfirmBG)
+exit_confirm = tkinter.Label(image = ExitConfirmBG)
 hide_widget(exit_confirm)
 
-ExitYesButtonBG = PhotoImage(file="data/images/Yes.png")
-exit_yes_button = Button(MainWindow, width=241, height=61, image=ExitYesButtonBG, borderwidth=0)
+ExitYesButtonBG = PhotoImage(file = "data/images/Yes.png")
+exit_yes_button = Button(MainWindow, width = 241, height = 61, image = ExitYesButtonBG, borderwidth = 0)
 exit_yes_button.bind('<Button-1>', close)
 hide_widget(exit_yes_button)
 
-ExitNoButtonBG = PhotoImage(file="data/images/No.png")
-exit_no_button = Button(MainWindow, width=241, height=61, image=ExitNoButtonBG, borderwidth=0)
+ExitNoButtonBG = PhotoImage(file = "data/images/No.png")
+exit_no_button = Button(MainWindow, width = 241, height = 61, image = ExitNoButtonBG, borderwidth = 0)
 exit_no_button.bind('<Button-1>', cancel)
 hide_widget(exit_no_button)
 
 ### Account Prompt ###
 AccountPrompDiagBG = Image.open("data/images/AccountPrompt.png")
 AccountPrompBG = ImageTk.PhotoImage(AccountPrompDiagBG)
-account_prompt = tkinter.Label(image=AccountPrompBG)
+account_prompt = tkinter.Label(image = AccountPrompBG)
 hide_widget(account_prompt)
 
 AccountPrompDiagText = Image.open("data/images/AccountPromptText.png")
 AccountPrompText = ImageTk.PhotoImage(AccountPrompDiagText)
-account_text = tkinter.Label(image=AccountPrompText, borderwidth=0)
+account_text = tkinter.Label(image = AccountPrompText, borderwidth = 0)
 hide_widget(account_text)
 
-OfflineButtonBG = PhotoImage(file="data/images/Offline.png")
-offline_button = Button(MainWindow, width=239, height=72, image=OfflineButtonBG, borderwidth=0)
+OfflineButtonBG = PhotoImage(file = "data/images/Offline.png")
+offline_button = Button(MainWindow, width = 239, height = 72, image = OfflineButtonBG, borderwidth = 0)
 offline_button.bind('<Button-1>', play_offline)
 hide_widget(offline_button)
 
-CreateButtonBG = PhotoImage(file="data/images/Create.png")
-create_button = Button(MainWindow, width=239, height=72, image=CreateButtonBG, borderwidth=0)
+CreateButtonBG = PhotoImage(file = "data/images/Create.png")
+create_button = Button(MainWindow, width = 239, height = 72, image = CreateButtonBG, borderwidth = 0)
 create_button.bind('<Button-1>', create_account)
 hide_widget(create_button)
 
-LoginButtonBG = PhotoImage(file="data/images/Login.png")
-login_button = Button(MainWindow, width=239, height=72, image=LoginButtonBG, borderwidth=0)
+LoginButtonBG = PhotoImage(file = "data/images/Login.png")
+login_button = Button(MainWindow, width = 239, height = 72, image = LoginButtonBG, borderwidth = 0)
 login_button.bind('<Button-1>', login_account)
 hide_widget(login_button)
 
-BackAuthButtonBG = PhotoImage(file="data/images/Back_Account.png")
-back_auth_button = Button(MainWindow, width=62, height=60, image=BackAuthButtonBG, borderwidth=0)
+BackAuthButtonBG = PhotoImage(file = "data/images/Back_Account.png")
+back_auth_button = Button(MainWindow, width = 62, height = 60, image = BackAuthButtonBG, borderwidth = 0)
 back_auth_button.bind('<Button-1>', back_auth)
 hide_widget(back_auth_button)
 
 LoginAuthText = Image.open("data/images/LoginAuth.png")
 LoginAuth = ImageTk.PhotoImage(LoginAuthText)
-login_auth = tkinter.Label(image=LoginAuth, borderwidth=0)
+login_auth = tkinter.Label(image = LoginAuth, borderwidth = 0)
 hide_widget(login_auth)
 
 CreateAccText = Image.open("data/images/CreateAcc.png")
 CreateAcc = ImageTk.PhotoImage(CreateAccText)
-create_acc = tkinter.Label(image=CreateAcc, borderwidth=0)
+create_acc = tkinter.Label(image = CreateAcc, borderwidth = 0)
 hide_widget(create_acc)
 
 ### Get User's credential ###
-custom_font = font.Font(family='Segoe UI', size=20)
+custom_font = font.Font(family = 'Segoe UI', size = 20)
 
-username = Entry(MainWindow, width=35)
+username = Entry(MainWindow, width = 35)
 username['font'] = custom_font
 hide_widget(username)
 
-password = Entry(MainWindow, width=35, show="*")
+password = Entry(MainWindow, width = 35, show = "*")
 password['font'] = custom_font
 hide_widget(password)
 
-password_confirm = Entry(MainWindow, width=35, show="*")
+password_confirm = Entry(MainWindow, width = 35, show = "*")
 password_confirm['font'] = custom_font
 hide_widget(password_confirm)
 
-auth_message = Label(MainWindow, justify='left')
+auth_message = Label(MainWindow, justify = 'left')
 auth_message['font'] = custom_font
 hide_widget(auth_message)
 
-login_success = Label(MainWindow, anchor='c', justify='center')
+login_success = Label(MainWindow, anchor = 'c', justify = 'center')
 login_success['font'] = custom_font
-login_success.config(font=("Segoe UI", 28))
+login_success.config(font = ("Segoe UI", 28))
 hide_widget(login_success)
 
 ### Prompt user to sync ###
 SyncPromptText = Image.open("data/images/SyncPromptMsg.png")
 SyncPrompt = ImageTk.PhotoImage(SyncPromptText)
-sync_prompt = tkinter.Label(image=SyncPrompt, borderwidth=0)
+sync_prompt = tkinter.Label(image = SyncPrompt, borderwidth = 0)
 hide_widget(sync_prompt)
 
-GoToSyncBG = PhotoImage(file="data/images/SyncContinue.png")
-go_to_sync = Button(MainWindow, width=239, height=72, image=GoToSyncBG, borderwidth=0)
+GoToSyncBG = PhotoImage(file = "data/images/SyncContinue.png")
+go_to_sync = Button(MainWindow, width = 239, height = 72, image = GoToSyncBG, borderwidth = 0)
 go_to_sync.bind('<Button-1>', sync)
 hide_widget(go_to_sync)
 
 ### Prompt user to logout ###
 LogoutPromptText = Image.open("data/images/LogoutPrompt.png")
 LogoutPrompt = ImageTk.PhotoImage(LogoutPromptText)
-logout_prompt = tkinter.Label(image=LogoutPrompt, borderwidth=0)
+logout_prompt = tkinter.Label(image = LogoutPrompt, borderwidth = 0)
 hide_widget(logout_prompt)
 
-logout_button = Button(MainWindow, width=241, height=61, image=ExitYesButtonBG, borderwidth=0)
+logout_button = Button(MainWindow, width = 241, height = 61, image = ExitYesButtonBG, borderwidth = 0)
 logout_button.bind('<Button-1>', logout)
 hide_widget(logout_button)
 
-cancel_logout_button = Button(MainWindow, width=241, height=61, image=ExitNoButtonBG, borderwidth=0)
+cancel_logout_button = Button(MainWindow, width = 241, height = 61, image = ExitNoButtonBG, borderwidth = 0)
 cancel_logout_button.bind('<Button-1>', to_main_menu)
 hide_widget(cancel_logout_button)
 
 ### Display no sync dialog error ###
 NoSyncText = Image.open("data/images/NoSync.png")
 NoSync = ImageTk.PhotoImage(NoSyncText)
-no_sync = tkinter.Label(image=NoSync, borderwidth=0)
+no_sync = tkinter.Label(image = NoSync, borderwidth = 0)
 hide_widget(no_sync)
 
-OkButtonBG = PhotoImage(file="data/images/Ok.png")
-ok_button = Button(MainWindow, width=241, height=61, image=OkButtonBG, borderwidth=0)
+OkButtonBG = PhotoImage(file = "data/images/Ok.png")
+ok_button = Button(MainWindow, width = 241, height = 61, image = OkButtonBG, borderwidth = 0)
 ok_button.bind('<Button-1>', ok)
 hide_widget(ok_button)
 
 ### User's Profile ###
 DiagBoxBG = Image.open("data/images/DiagBox.png")
 DiagBox = ImageTk.PhotoImage(DiagBoxBG)
-diag_box = tkinter.Label(image=DiagBox, borderwidth=0)
+diag_box = tkinter.Label(image = DiagBox, borderwidth = 0)
 hide_widget(diag_box)
 
-profile_name = Label(MainWindow, justify='left')
+profile_name = Label(MainWindow, justify = 'left')
 profile_name['font'] = custom_font
-profile_name.config(font=("Segoe UI", 44))
+profile_name.config(font = ("Segoe UI", 44))
 hide_widget(profile_name)
 
-profile_stat = Label(MainWindow, justify='right', text="Times Played : \nEasy : \nNormal : \nHard : \n Expert : ")
+profile_stat = Label(MainWindow, justify = 'right', text = "Times Played : \nEasy : \nNormal : \nHard : \n Expert : ")
 profile_stat['font'] = custom_font
-profile_stat.config(font=("Segoe UI", 28))
+profile_stat.config(font = ("Segoe UI", 28))
 hide_widget(profile_stat)
 
-profile_stat_game = Label(MainWindow, justify='left')
+profile_stat_game = Label(MainWindow, justify = 'left')
 profile_stat_game['font'] = custom_font
-profile_stat_game.config(font=("Segoe UI", 28))
+profile_stat_game.config(font = ("Segoe UI", 28))
 hide_widget(profile_stat_game)
 
 MaleProfilePicBG = Image.open("data/images/Male.png")
 MaleProfilePic = ImageTk.PhotoImage(MaleProfilePicBG)
-male_profile_pic = tkinter.Label(image=MaleProfilePic, borderwidth=0)
+male_profile_pic = tkinter.Label(image = MaleProfilePic, borderwidth = 0)
 hide_widget(male_profile_pic)
 
 FemaleProfilePicBG = Image.open("data/images/Female.png")
 FemaleProfilePic = ImageTk.PhotoImage(FemaleProfilePicBG)
-female_profile_pic = tkinter.Label(image=FemaleProfilePic, borderwidth=0)
+female_profile_pic = tkinter.Label(image = FemaleProfilePic, borderwidth = 0)
 hide_widget(female_profile_pic)
 
-ChangeGenderBG = PhotoImage(file="data/images/Gender.png")
-change_gender_button = Button(MainWindow, width=76, height=76, image=ChangeGenderBG, borderwidth=0)
+ChangeGenderBG = PhotoImage(file = "data/images/Gender.png")
+change_gender_button = Button(MainWindow, width = 76, height = 76, image = ChangeGenderBG, borderwidth = 0)
 change_gender_button.bind('<Button-1>', change_gender)
 hide_widget(change_gender_button)
 
 ### Difficulty selection ###
 SelectDifficultyBG = Image.open("data/images/SelectDifficulty.png")
 SelectDifficulty = ImageTk.PhotoImage(SelectDifficultyBG)
-select_difficulty = tkinter.Label(image=SelectDifficulty, borderwidth=0)
+select_difficulty = tkinter.Label(image = SelectDifficulty, borderwidth = 0)
 hide_widget(select_difficulty)
 
-EasyDifficultyBG = PhotoImage(file="data/images/Easy.png")
-easy_difficulty_button = Button(MainWindow, width=288, height=418, image=EasyDifficultyBG, borderwidth=0)
+EasyDifficultyBG = PhotoImage(file = "data/images/Easy.png")
+easy_difficulty_button = Button(MainWindow, width = 288, height = 418, image = EasyDifficultyBG, borderwidth = 0)
 easy_difficulty_button.bind('<Button-1>', easy_gamemode)
 hide_widget(easy_difficulty_button)
 
-NormalDifficultyBG = PhotoImage(file="data/images/Normal.png")
-normal_difficulty_button = Button(MainWindow, width=288, height=418, image=NormalDifficultyBG, borderwidth=0)
+NormalDifficultyBG = PhotoImage(file = "data/images/Normal.png")
+normal_difficulty_button = Button(MainWindow, width = 288, height = 418, image = NormalDifficultyBG, borderwidth = 0)
 normal_difficulty_button.bind('<Button-1>', normal_gamemode)
 hide_widget(normal_difficulty_button)
 
-HardDifficultyBG = PhotoImage(file="data/images/Hard.png")
-hard_difficulty_button = Button(MainWindow, width=288, height=418, image=HardDifficultyBG, borderwidth=0)
+HardDifficultyBG = PhotoImage(file = "data/images/Hard.png")
+hard_difficulty_button = Button(MainWindow, width = 288, height = 418, image = HardDifficultyBG, borderwidth = 0)
 hard_difficulty_button.bind('<Button-1>', hard_gamemode)
 hide_widget(hard_difficulty_button)
 
-ExpertDifficultyBG = PhotoImage(file="data/images/Expert.png")
-expert_difficulty_button = Button(MainWindow, width=288, height=418, image=ExpertDifficultyBG, borderwidth=0)
+ExpertDifficultyBG = PhotoImage(file = "data/images/Expert.png")
+expert_difficulty_button = Button(MainWindow, width = 288, height = 418, image = ExpertDifficultyBG, borderwidth = 0)
 expert_difficulty_button.bind('<Button-1>', expert_gamemode)
 hide_widget(expert_difficulty_button)
 
 ### PreCountdown text ###
-pre_countdown = Label(MainWindow, width=25)
+pre_countdown = Label(MainWindow, width = 25)
 pre_countdown['font'] = custom_font
-pre_countdown.config(font=("Segoe UI", 40))
+pre_countdown.config(font = ("Segoe UI", 40))
 hide_widget(pre_countdown)
 
 ### Random integer ###
-rand_int_text = Label(MainWindow, width=15)
+rand_int_text = Label(MainWindow, width = 15)
 rand_int_text['font'] = custom_font
-rand_int_text.config(font=("Segoe UI", 100))
+rand_int_text.config(font = ("Segoe UI", 100))
 hide_widget(rand_int_text)
 
 ### Answer field ###
-user_answer = Entry(MainWindow, width=20)
+user_answer = Entry(MainWindow, width = 20)
 user_answer['font'] = custom_font
-user_answer.config(font=("Segoe UI", 40))
+user_answer.config(font = ("Segoe UI", 40))
 user_answer.bind('<Key>', check_answer)
 hide_widget(user_answer)
 
 ### Prompt user to cancel game ###
 CancelGameBG = Image.open("data/images/CancelGame.png")
 CancelGame = ImageTk.PhotoImage(CancelGameBG)
-cancel_game = tkinter.Label(image=CancelGame, borderwidth=0)
+cancel_game = tkinter.Label(image = CancelGame, borderwidth = 0)
 hide_widget(cancel_game)
 
-CancelGameYes = PhotoImage(file="data/images/Yes.png")
-cancel_game_yes = Button(MainWindow, width=241, height=61, image=CancelGameYes, borderwidth=0)
+CancelGameYes = PhotoImage(file = "data/images/Yes.png")
+cancel_game_yes = Button(MainWindow, width = 241, height = 61, image = CancelGameYes, borderwidth = 0)
 cancel_game_yes.bind('<Button-1>', prompt_exit)
 hide_widget(cancel_game_yes)
 
-CancelGameNo = PhotoImage(file="data/images/No.png")
-cancel_game_no = Button(MainWindow, width=241, height=61, image=CancelGameNo, borderwidth=0)
+CancelGameNo = PhotoImage(file = "data/images/No.png")
+cancel_game_no = Button(MainWindow, width = 241, height = 61, image = CancelGameNo, borderwidth = 0)
 cancel_game_no.bind('<Button-1>', prompt_exit_cancel)
 hide_widget(cancel_game_no)
 
 ### Ok Button when game finished ###
-FinishGame = PhotoImage(file="data/images/Ok.png")
-finish_game = Button(MainWindow, width=241, height=61, image=FinishGame, borderwidth=0)
+FinishGame = PhotoImage(file = "data/images/Ok.png")
+finish_game = Button(MainWindow, width = 241, height = 61, image = FinishGame, borderwidth = 0)
 finish_game.bind('<Button-1>', ok_result)
 hide_widget(finish_game)
 
