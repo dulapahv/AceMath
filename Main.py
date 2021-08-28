@@ -120,14 +120,9 @@ def fullscreen(event):
 
 # Show/Hide widgets and canvases when user moves from MainMenu
 def out_main_menu():
-    hide_widget(play_button)
-    hide_widget(sync_button)
-    hide_widget(profile_button)
-    hide_widget(about_button)
-    hide_widget(exit_button)
-    hide_widget(exit_confirm)
-    hide_widget(exit_no_button)
-    hide_widget(exit_yes_button)
+    hideWidgetList = [play_button, sync_button, profile_button, about_button, exit_button, exit_confirm, exit_no_button, exit_yes_button]
+    for widget in hideWidgetList:
+        hide_widget(widget)
     show_widget(back_button, 80, 20)
     hide_canvas(BGFullCanvas)
     show_canvas(BGCanvas)
