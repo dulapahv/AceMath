@@ -24,9 +24,7 @@ stopwatch = Stopwatch()  # Initialize stopwatch variable
 
 # Authenticate Firebase database
 cred = credentials.Certificate('data/acemath-n0miya-firebase-adminsdk-yft0t-e8061fb0b1.json')
-firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://acemath-n0miya-default-rtdb.asia-southeast1.firebasedatabase.app/'
-})
+firebase_admin.initialize_app(cred, {'databaseURL': 'https://acemath-n0miya-default-rtdb.asia-southeast1.firebasedatabase.app/'})
 
 
 # Create new user in Firebase database
@@ -93,25 +91,6 @@ def write_data(string_to_search, value):
     with open("data/data.txt", 'w') as read_obj:
         read_obj.write(filedata)
     read_obj.close()
-
-
-# # Read data from data.txt
-# def read_data(line):
-#     file = open('data/data.txt', "r")
-#     content = file.readlines()
-#     data = (content[line])
-#     file.close()
-#     return data.rstrip('\n')
-
-
-# # Write data to data.txt
-# def write_data(line, data):
-#     file = open('data/data.txt', "r")
-#     content = file.readlines()
-#     content[line] = str(data) + "\n"
-#     file = open("data/data.txt", "w")
-#     file.writelines(content)
-#     file.close()
 
 
 # Hide canvas
@@ -271,22 +250,18 @@ def profile(event):
         show_widget(profile_stat_game, 1245, 400)
         show_widget(change_gender_button, 248, 840)
         profile_name.config(text=read_data("firebaseUsername"))
-        profile_stat_game.config(text=sum_times_played(read_data("firebaseUsername")) + "\n" + str(db.reference(
-            'Users/' + read_data("firebaseUsername") + '/TimesPlayed/Easy').get()) +
-                                      " (Fastest : " + str(
-            db.reference('Users/' + read_data("firebaseUsername") + '/FastestTime/Easy').get()) + ")" + "\n" +
-                                      str(db.reference(
-                                          'Users/' + read_data("firebaseUsername") + '/TimesPlayed/Normal').get()) +
-                                      " (Fastest : " + str(
-            db.reference('Users/' + read_data("firebaseUsername") + '/FastestTime/Normal').get()) + ")" + "\n" +
-                                      str(db.reference(
-                                          'Users/' + read_data("firebaseUsername") + '/TimesPlayed/Hard').get()) +
-                                      " (Fastest : " + str(
-            db.reference('Users/' + read_data("firebaseUsername") + '/FastestTime/Hard').get()) + ")" + "\n" +
-                                      str(db.reference(
-                                          'Users/' + read_data("firebaseUsername") + '/TimesPlayed/Expert').get()) +
-                                      " (Fastest : " + str(
-            db.reference('Users/' + read_data("firebaseUsername") + '/FastestTime/Expert').get()) + ")" + "\n")
+        profile_stat_game.config(text=sum_times_played(read_data("firebaseUsername")) + "\n" + 
+            str(db.reference('Users/' + read_data("firebaseUsername") + '/TimesPlayed/Easy').get()) + " (Fastest : " + 
+            str(db.reference('Users/' + read_data("firebaseUsername") + '/FastestTime/Easy').get()) + ")" + "\n" +
+            
+            str(db.reference('Users/' + read_data("firebaseUsername") + '/TimesPlayed/Normal').get()) + " (Fastest : " + 
+            str(db.reference('Users/' + read_data("firebaseUsername") + '/FastestTime/Normal').get()) + ")" + "\n" +
+            
+            str(db.reference('Users/' + read_data("firebaseUsername") + '/TimesPlayed/Hard').get()) + " (Fastest : " + 
+            str(db.reference('Users/' + read_data("firebaseUsername") + '/FastestTime/Hard').get()) + ")" + "\n" +
+            
+            str(db.reference('Users/' + read_data("firebaseUsername") + '/TimesPlayed/Expert').get()) + " (Fastest : " + 
+            str(db.reference('Users/' + read_data("firebaseUsername") + '/FastestTime/Expert').get()) + ")" + "\n")
         if str(db.reference('Users/' + read_data("firebaseUsername") + '/Gender').get()) == "0":
             show_widget(male_profile_pic, 300, 300)
         else:
@@ -515,8 +490,7 @@ def countdown_timer(t):
     while t >= 0:
         if read_data("isStopwatchPaused") == "False":
             MainWindow.after(1000)
-            pre_countdown.config(text="Game will start in " + str(t) + " seconds!\nPress 'ENTER' to submit answer",
-                                 fg="black")
+            pre_countdown.config(text="Game will start in " + str(t) + " seconds!\nPress 'ENTER' to submit answer", fg="black")
             t -= 1
         MainWindow.update()  # Prevent Tkinter from locking up
     if read_data("isStopwatchPaused") == "False":
@@ -608,13 +582,10 @@ def submit_score():
         played = times_played.get()
         played += 1
         user = db.reference('Users')
-        user.update({
-            read_data("firebaseUsername") + '/TimesPlayed/' + read_data("selectedDifficulty"): played,
-        })
+        user.update({read_data("firebaseUsername") + '/TimesPlayed/' + read_data("selectedDifficulty"): played,})
         best_time_prev = db.reference('Users/' + read_data("firebaseUsername") + '/FastestTime/' + read_data("selectedDifficulty") + 'Value')
         if stopwatch.duration < best_time_prev.get():
-            pre_countdown.config(text="Congratulations!" + "\n" + "Your time is " + str(stopwatch) + "\nNew Record!",
-                                 fg="green")
+            pre_countdown.config(text="Congratulations!" + "\n" + "Your time is " + str(stopwatch) + "\nNew Record!", fg="green")
             user.update({
                 read_data("firebaseUsername") + '/FastestTime/' + read_data("selectedDifficulty"): str(stopwatch),
                 read_data("firebaseUsername") + '/FastestTime/' + read_data("selectedDifficulty") + 'Value': stopwatch.duration
