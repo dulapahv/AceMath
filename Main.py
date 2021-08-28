@@ -72,39 +72,46 @@ def sum_times_played(user_name):
     return str(sum_played)
 
 
-def search_string_in_file(file_name, string_to_search):
-    line_number = 0
-    list_of_results = []
-    # Open the file in read only mode
-    with open(file_name, 'r') as read_obj:
-        # Read all lines in the file one by one
+# Search and get value in data.txt
+def read_data(string_to_search):
+    lineNumber = 0
+    with open("data/data.txt", 'r') as read_obj:
         for line in read_obj:
-            # For each line, check if line contains the string
-            line_number += 1
+            lineNumber += 1
             if string_to_search in line:
-                # If yes, then add the line number & line as a tuple in the list
-                list_of_results.append((line_number, line.rstrip()))
-    # Return list of tuples containing line numbers and lines where string is found
-    return list_of_results
+                value = line.rstrip()
+    read_obj.close()
+    return value.removeprefix(string_to_search + " = ")
 
 
-# Read data from data.txt
-def read_data(line):
-    file = open('data/data.txt', "r")
-    content = file.readlines()
-    data = (content[line])
-    file.close()
-    return data.rstrip('\n')
+# Search and replace value in data.txt
+def write_data(string_to_search, value):
+    lineNumber = 0
+    with open("data/data.txt", 'r+') as read_obj:
+        filedata = read_obj.read()
+        filedata = filedata.replace(string_to_search + " = " + read_data(string_to_search), string_to_search + " = " + str(value))
+    with open("data/data.txt", 'w') as read_obj:
+        read_obj.write(filedata)
+    read_obj.close()
 
 
-# Write data to data.txt
-def write_data(line, data):
-    file = open('data/data.txt', "r")
-    content = file.readlines()
-    content[line] = str(data) + "\n"
-    file = open("data/data.txt", "w")
-    file.writelines(content)
-    file.close()
+# # Read data from data.txt
+# def read_data(line):
+#     file = open('data/data.txt', "r")
+#     content = file.readlines()
+#     data = (content[line])
+#     file.close()
+#     return data.rstrip('\n')
+
+
+# # Write data to data.txt
+# def write_data(line, data):
+#     file = open('data/data.txt', "r")
+#     content = file.readlines()
+#     content[line] = str(data) + "\n"
+#     file = open("data/data.txt", "w")
+#     file.writelines(content)
+#     file.close()
 
 
 # Hide canvas
@@ -152,9 +159,9 @@ def out_main_menu():
 
 # Show/Hide widgets and canvases when user moves to MainMenu
 def to_main_menu(event):
-    if read_data(25) == "True":  # isUserInGame
+    if read_data("isUserInGame") == "True":
         stopwatch.stop()
-        write_data(22, "True")  # isStopwatchPaused
+        write_data("isStopwatchPaused", "True")
         show_widget(account_prompt, 500, 380)
         show_widget(cancel_game, 550, 480)
         show_widget(cancel_game_yes, 700, 683)
@@ -215,14 +222,14 @@ def back_auth(event):
     username.delete(0, 'end')  # clear entered field
     password.delete(0, 'end')
     password_confirm.delete(0, 'end')
-    write_data(7, "False")  # isUserInCredentialScreen
+    write_data("isUserInCredentialScreen", "False")
 
 
 # When user presses Play button
 def play(event):
     out_main_menu()
     # If not login, player only have choice to play offline or go back to Sync menu
-    if int(read_data(1)) == 0:
+    if read_data("isFirebaseConnected") == "False":
         show_widget(account_prompt, 500, 380)
         show_widget(sync_prompt, 520, 400)
         show_widget(go_to_sync, 1015, 683)
@@ -235,7 +242,7 @@ def play(event):
 def sync(event):
     out_main_menu()
     # Prompt user to choose whether they want to create an account, connect to existing account, or play offline
-    if int(read_data(1)) == 0:
+    if read_data("isFirebaseConnected") == "False":
         hide_widget(go_to_sync)
         hide_widget(sync_prompt)
         hide_widget(offline_button)
@@ -252,7 +259,7 @@ def sync(event):
 
 # When user presses Profile button
 def profile(event):
-    if int(read_data(1)) == 0:
+    if read_data("isFirebaseConnected") == "False":
         show_widget(account_prompt, 500, 380)
         show_widget(no_sync, 650, 550)
         show_widget(ok_button, 860, 683)
@@ -263,24 +270,24 @@ def profile(event):
         show_widget(profile_stat, 1000, 400)
         show_widget(profile_stat_game, 1245, 400)
         show_widget(change_gender_button, 248, 840)
-        profile_name.config(text=str(read_data(4)))
-        profile_stat_game.config(text=sum_times_played(str(read_data(4))) + "\n" + str(db.reference(
-            'Users/' + str(read_data(4)) + '/TimesPlayed/Easy').get()) +
+        profile_name.config(text=read_data("firebaseUsername"))
+        profile_stat_game.config(text=sum_times_played(read_data("firebaseUsername")) + "\n" + str(db.reference(
+            'Users/' + read_data("firebaseUsername") + '/TimesPlayed/Easy').get()) +
                                       " (Fastest : " + str(
-            db.reference('Users/' + str(read_data(4)) + '/FastestTime/Easy').get()) + ")" + "\n" +
+            db.reference('Users/' + read_data("firebaseUsername") + '/FastestTime/Easy').get()) + ")" + "\n" +
                                       str(db.reference(
-                                          'Users/' + str(read_data(4)) + '/TimesPlayed/Normal').get()) +
+                                          'Users/' + read_data("firebaseUsername") + '/TimesPlayed/Normal').get()) +
                                       " (Fastest : " + str(
-            db.reference('Users/' + str(read_data(4)) + '/FastestTime/Normal').get()) + ")" + "\n" +
+            db.reference('Users/' + read_data("firebaseUsername") + '/FastestTime/Normal').get()) + ")" + "\n" +
                                       str(db.reference(
-                                          'Users/' + str(read_data(4)) + '/TimesPlayed/Hard').get()) +
+                                          'Users/' + read_data("firebaseUsername") + '/TimesPlayed/Hard').get()) +
                                       " (Fastest : " + str(
-            db.reference('Users/' + str(read_data(4)) + '/FastestTime/Hard').get()) + ")" + "\n" +
+            db.reference('Users/' + read_data("firebaseUsername") + '/FastestTime/Hard').get()) + ")" + "\n" +
                                       str(db.reference(
-                                          'Users/' + str(read_data(4)) + '/TimesPlayed/Expert').get()) +
+                                          'Users/' + read_data("firebaseUsername") + '/TimesPlayed/Expert').get()) +
                                       " (Fastest : " + str(
-            db.reference('Users/' + str(read_data(4)) + '/FastestTime/Expert').get()) + ")" + "\n")
-        if str(db.reference('Users/' + str(read_data(4)) + '/Gender').get()) == "0":
+            db.reference('Users/' + read_data("firebaseUsername") + '/FastestTime/Expert').get()) + ")" + "\n")
+        if str(db.reference('Users/' + read_data("firebaseUsername") + '/Gender').get()) == "0":
             show_widget(male_profile_pic, 300, 300)
         else:
             show_widget(female_profile_pic, 300, 300)
@@ -324,7 +331,7 @@ def play_offline(event):
 
 # If user selects register account
 def create_account(event):
-    if read_data(7) == "False":  # isUserInCredentialScreen
+    if read_data("isUserInCredentialScreen") == "False":
         hide_widget(offline_button)
         hide_widget(login_button)
         hide_widget(account_text)
@@ -335,7 +342,7 @@ def create_account(event):
         show_widget(username, 900, 470)
         show_widget(password, 900, 535)
         show_widget(password_confirm, 900, 602)
-        write_data(7, "True")  # isUserInCredentialScreen
+        write_data("isUserInCredentialScreen", "True")
     else:
         # Check login credential
         show_widget(auth_message, 520, 683)
@@ -353,7 +360,7 @@ def create_account(event):
 
 # If user selects login account
 def login_account(event):
-    if read_data(7) == "False":  # isUserInCredentialScreen
+    if read_data("isUserInCredentialScreen") == "False":
         hide_widget(offline_button)
         hide_widget(create_button)
         hide_widget(account_text)
@@ -363,7 +370,7 @@ def login_account(event):
         show_widget(back_auth_button, 520, 400)
         show_widget(username, 820, 520)
         show_widget(password, 820, 585)
-        write_data(7, "True")  # isUserInCredentialScreen
+        write_data("isUserInCredentialScreen", "True")
     else:
         # Check login credential
         show_widget(auth_message, 520, 683)
@@ -374,8 +381,8 @@ def login_account(event):
         elif user.get() == "None" or key.get() != password.get():
             auth_message.config(text="Username or password is incorrect. Try again.", fg="red")
         else:
-            write_data(1, 1)
-            write_data(4, username.get())
+            write_data("isFirebaseConnected", "True")
+            write_data("firebaseUsername", username.get())
             hide_widget(auth_message)
             hide_widget(login_button)
             hide_widget(login_auth)
@@ -384,7 +391,7 @@ def login_account(event):
             hide_widget(password)
             show_widget(ok_button, 860, 683)
             show_widget(login_success, 800, 420)
-            write_data(7, "False")  # isUserInCredentialScreen
+            write_data("isUserInCredentialScreen", "False") 
             login_success.config(text="Login successful! \n\n  Username : " + username.get() +
                                       "\nHave a nice day!", fg="green")
             username.delete(0, 'end')
@@ -393,8 +400,9 @@ def login_account(event):
 
 # Clear login data and parameter
 def logout(event):
-    write_data(1, 0)
-    write_data(4, "null")
+    write_data("isUserInCredentialScreen", "False")
+    write_data("firebaseUsername", "null")
+    write_data("isFirebaseConnected", "False")
     to_main_menu(event)
 
 
@@ -409,14 +417,14 @@ def ok(event):
 
 # Change gender
 def change_gender(event):
-    if str(db.reference('Users/' + str(read_data(4)) + '/Gender').get()) == "0":
+    if str(db.reference('Users/' + read_data("firebaseUsername") + '/Gender').get()) == "0":
         show_widget(female_profile_pic, 300, 300)
         hide_widget(male_profile_pic)
-        write_to_firebase(str(read_data(4)), "Gender", 1)
+        write_to_firebase(read_data("firebaseUsername"), "Gender", 1)
     else:
         show_widget(male_profile_pic, 300, 300)
         hide_widget(female_profile_pic)
-        write_to_firebase(str(read_data(4)), "Gender", 0)
+        write_to_firebase(read_data("firebaseUsername"), "Gender", 0)
 
 
 # Prompt user to select difficulty
@@ -443,9 +451,9 @@ def prompt_exit(event):
     hide_widget(cancel_game)
     hide_widget(cancel_game_yes)
     hide_widget(cancel_game_no)
-    write_data(25, "False")  # isUserInGame
-    write_data(22, "False")  # isStopwatchPaused
-    write_data(19, 0)
+    write_data("isUserInGame", "False")
+    write_data("isStopwatchPaused", "False")
+    write_data("isGameStarted", "False")
     winsound.PlaySound('data/sounds/BGMusic.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
     to_main_menu(event)
 
@@ -458,45 +466,45 @@ def prompt_exit_cancel(event):
     hide_widget(cancel_game_no)
     show_widget(rand_int_text, 400, 350)
     show_widget(diag_box, 227, 200)
-    if read_data(19) == "1":
+    if read_data("isGameStarted") == "True":
         show_widget(user_answer, 670, 750)
         show_widget(pre_countdown, 900, 215)
         user_answer.config(state='normal')
     else:
         show_widget(pre_countdown, 580, 520)
-    write_data(22, "False")  # isStopwatchPaused
+    write_data("isStopwatchPaused", "False") 
     stopwatch.start()
 
 
 # If user select easy gamemode
 def easy_gamemode(event):
-    write_data(10, "Easy")
-    write_data(13, 9)
-    write_data(16, 1)
+    write_data("selectedDifficulty", "Easy")
+    write_data("questionSize", 9)
+    write_data("integerSize", 1)
     start_game()
 
 
 # If user select normal gamemode
 def normal_gamemode(event):
-    write_data(10, "Normal")
-    write_data(13, 19)
-    write_data(16, 2)
+    write_data("selectedDifficulty", "Normal")
+    write_data("questionSize", 19)
+    write_data("integerSize", 2)
     start_game()
 
 
 # If user select hard gamemode
 def hard_gamemode(event):
-    write_data(10, "Hard")
-    write_data(13, 29)
-    write_data(16, 3)
+    write_data("selectedDifficulty", "Hard")
+    write_data("questionSize", 29)
+    write_data("integerSize", 3)
     start_game()
 
 
 # If user select expert gamemode
 def expert_gamemode(event):
-    write_data(10, "Expert")
-    write_data(13, 39)
-    write_data(16, 4)
+    write_data("selectedDifficulty", "Expert")
+    write_data("questionSize", 39)
+    write_data("integerSize", 4)
     start_game()
 
 
@@ -505,17 +513,17 @@ def countdown_timer(t):
     winsound.PlaySound(None, winsound.SND_PURGE)
     show_widget(pre_countdown, 580, 520)
     while t >= 0:
-        if read_data(22) == "False":  # isStopwatchPaused
+        if read_data("isStopwatchPaused") == "False":
             MainWindow.after(1000)
             pre_countdown.config(text="Game will start in " + str(t) + " seconds!\nPress 'ENTER' to submit answer",
                                  fg="black")
             t -= 1
         MainWindow.update()  # Prevent Tkinter from locking up
-    if read_data(22) == "False":  # isStopwatchPaused
+    if read_data("isStopwatchPaused") == "False":
         stopwatch.restart()
         user_answer.config(state='normal')
         show_widget(back_button, 80, 20)
-        write_data(19, 1)
+        write_data("isGameStarted", "True")
         winsound.PlaySound('data/sounds/GameStart.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
 
 
@@ -527,55 +535,55 @@ def start_game():
     hide_widget(hard_difficulty_button)
     hide_widget(expert_difficulty_button)
     hide_widget(back_button)
-    write_data(25, "True")
-    write_data(28, 0)
+    write_data("isUserInGame", "True")
+    write_data("currentQuestionNumber", 0)
     countdown_timer(5)
     summon_question()
 
 
 # Create questions based on difficulty
 def summon_question():
-    integer_size = read_data(16)
+    integer_size = read_data("integerSize")
     if integer_size == "1":
-        write_data(34, 0)
-        write_data(37, 9)
+        write_data("minInteger", 0)
+        write_data("maxInteger", 9)
     elif integer_size == "2":
-        write_data(34, 10)
-        write_data(37, 99)
+        write_data("minInteger", 10)
+        write_data("maxInteger", 99)
     elif integer_size == "3":
-        write_data(34, 100)
-        write_data(37, 999)
+        write_data("minInteger", 100)
+        write_data("maxInteger", 999)
     elif integer_size == "4":
-        write_data(34, 1000)
-        write_data(37, 9999)
+        write_data("minInteger", 1000)
+        write_data("maxInteger", 9999)
     summon_integer()
 
 
 # Create sets of integers for questions
 def summon_integer():
-    if int(read_data(28)) <= int(read_data(13)):
+    if int(read_data("currentQuestionNumber")) <= int(read_data("questionSize")):
         show_widget(user_answer, 670, 750)
         show_widget(rand_int_text, 400, 350)
         user_answer.focus()
-        min_integer = int(read_data(34))
-        max_integer = int(read_data(37))
+        min_integer = int(read_data("minInteger"))
+        max_integer = int(read_data("maxInteger"))
         int1 = random.randint(min_integer, max_integer)
         int2 = random.randint(min_integer, max_integer)
         rand_int_text.config(text=str(int1) + " + " + str(int2))
-        write_data(31, int1 + int2)
+        write_data("answer", int1 + int2)
         show_widget(pre_countdown, 900, 215)
-        q_number = read_data(28)
+        q_number = read_data("currentQuestionNumber")
         q_number_f = int(q_number) + 1
-        q_number_all = read_data(13)
+        q_number_all = read_data("questionSize")
         q_number_all_f = int(q_number_all) + 1
         pre_countdown.config(text=str(q_number_f) + "/" + str(q_number_all_f), anchor="e")
     else:  # Game finishes
         stopwatch.stop()
         winsound.PlaySound('data/sounds/GameFinish.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
         hide_widget(back_button)
-        write_data(28, 0)
-        write_data(25, "False")
-        write_data(19, 0)
+        write_data("currentQuestionNumber", 0)
+        write_data("isUserInGame", "False")
+        write_data("isGameStarted", "False")
         show_widget(finish_game, 840, 770)
         show_widget(pre_countdown, 420, 450)
         pre_countdown.config(text="Your time is " + str(stopwatch) + "\nKeep on trying!")
@@ -587,29 +595,29 @@ def summon_integer():
 
 # Check if user input correct answer
 def check_answer(event):
-    if user_answer.get() == read_data(31):
-        write_data(28, int(read_data(28)) + 1)
+    if user_answer.get() == read_data("answer"):
+        write_data("currentQuestionNumber", int(read_data("currentQuestionNumber")) + 1)
         user_answer.delete(0, 'end')
         summon_integer()
 
 
 # Submit score to Firebase if user already login
 def submit_score():
-    if read_data(1) == "1":
-        times_played = db.reference('Users/' + read_data(4) + '/TimesPlayed/' + read_data(10))
+    if read_data("isFirebaseConnected") == "True":
+        times_played = db.reference('Users/' + read_data("firebaseUsername") + '/TimesPlayed/' + read_data("selectedDifficulty"))
         played = times_played.get()
         played += 1
         user = db.reference('Users')
         user.update({
-            read_data(4) + '/TimesPlayed/' + read_data(10): played,
+            read_data("firebaseUsername") + '/TimesPlayed/' + read_data("selectedDifficulty"): played,
         })
-        best_time_prev = db.reference('Users/' + read_data(4) + '/FastestTime/' + read_data(10) + 'Value')
+        best_time_prev = db.reference('Users/' + read_data("firebaseUsername") + '/FastestTime/' + read_data("selectedDifficulty") + 'Value')
         if stopwatch.duration < best_time_prev.get():
             pre_countdown.config(text="Congratulations!" + "\n" + "Your time is " + str(stopwatch) + "\nNew Record!",
                                  fg="green")
             user.update({
-                read_data(4) + '/FastestTime/' + read_data(10): str(stopwatch),
-                read_data(4) + '/FastestTime/' + read_data(10) + 'Value': stopwatch.duration
+                read_data("firebaseUsername") + '/FastestTime/' + read_data("selectedDifficulty"): str(stopwatch),
+                read_data("firebaseUsername") + '/FastestTime/' + read_data("selectedDifficulty") + 'Value': stopwatch.duration
             })
 
 
@@ -631,11 +639,11 @@ MainWindow.wm_iconbitmap('data/images/AceMath.ico')
 MainWindow.bind('<F11>', fullscreen)
 MainWindow.bind('<Escape>', close_confirmation)
 winsound.PlaySound('data/sounds/BGMusic.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
-write_data(7, "False")  # isUserInCredentialScreen
-write_data(19, 0)
-write_data(22, "False")  # isStopwatchPaused
-write_data(25, "False")
-write_data(28, 0)
+write_data("isUserInCredentialScreen", "False")
+write_data("isGameStarted", "False")
+write_data("isStopwatchPaused", "False")
+write_data("isUserInGame", "False")
+write_data("currentQuestionNumber", 0)
 
 
 ### Create background ###

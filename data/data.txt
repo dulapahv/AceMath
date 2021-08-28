@@ -1,81 +1,13 @@
-isFirebaseConnected
-0
-
-firebaseUsername
-null
-
-isUserInCredentialScreen
-False
-
-selectedDifficulty
-Easy
-
-questionSize
-9
-
-integerSize
-1
-
-isGameStarted
-0
-
-isStopwatchPaused
-False
-
-isUserInGame
-False
-
-currentQuestionNumber
-0
-
-answer
-8
-
-minInteger
-0
-
-maxInteger
-9
-
-
-### ORIGINAL DATA ###
-isFirebaseConnected
-0
-
-firebaseUsername
-null
-
-isUserInCredentialScreen
-False
-
-selectedDifficulty
-null
-
-questionSize
-0
-
-integerSize
-0
-
-isGameStarted
-0
-
-isStopwatchPaused
-False
-
-isUserInGame
-False
-
-currentQuestionNumber
-0
-
-answer
-0
-
-minInteger
-0
-
-maxInteger
-0
-
-### END ###
+isFirebaseConnected = False
+firebaseUsername = null
+isUserInCredentialScreen = False
+selectedDifficulty = null
+questionSize = 0
+integerSize = 0
+isGameStarted = False
+isStopwatchPaused = False
+isUserInGame = False
+currentQuestionNumber = 0
+answer = 0
+minInteger = 0
+maxInteger = 0
