@@ -135,11 +135,10 @@ def to_main_menu(event):
         hideWidgetList = [pre_countdown, rand_int_text, user_answer]
         for widget in hideWidgetList:
             hide_widget(widget)
+        showWidgetList = [[account_prompt, 500, 380], [cancel_game, 550, 480], [cancel_game_yes, 700, 683], [cancel_game_no, 1015, 683]]
+        for widget in range(len(showWidgetList)):
+            show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
         write_data("isStopwatchPaused", "True")
-        show_widget(account_prompt, 500, 380)
-        show_widget(cancel_game, 550, 480)
-        show_widget(cancel_game_yes, 700, 683)
-        show_widget(cancel_game_no, 1015, 683)
         user_answer.config(state = "disabled")
         hide_widget(diag_box)
     else:
@@ -149,11 +148,9 @@ def to_main_menu(event):
                         hard_difficulty_button, expert_difficulty_button]
         for widget in hideWidgetList:
             hide_widget(widget)
-        show_widget(play_button, 80, 425)
-        show_widget(sync_button, 80, 558)
-        show_widget(profile_button, 80, 690)
-        show_widget(about_button, 80, 810)
-        show_widget(exit_button, 80, 923)
+        showWidgetList = [[play_button, 80, 425], [sync_button, 80, 558], [profile_button, 80, 690], [about_button, 80, 810], [exit_button, 80, 923]]
+        for widget in range(len(showWidgetList)):
+            show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
         hide_canvas(BGCanvas)
         hide_canvas(AboutCanvas)
         show_canvas(BGFullCanvas)   
@@ -164,10 +161,9 @@ def back_auth(event):
     hideWidgetList = [login_auth, back_auth_button, auth_message, username, password, create_acc, password_confirm]
     for widget in hideWidgetList:
         hide_widget(widget)
-    show_widget(create_button, 700, 683)
-    show_widget(login_button, 1015, 683)
-    show_widget(account_text, 520, 400)
-    show_widget(back_button, 80, 20)
+    showWidgetList = [[create_button, 700, 683], [login_button, 1015, 683], [account_text, 520, 400], [back_button, 80, 20]]
+    for widget in range(len(showWidgetList)):
+        show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
     username.delete(0, 'end')  # clear entered field
     password.delete(0, 'end')
     password_confirm.delete(0, 'end')
@@ -179,10 +175,9 @@ def play(event):
     out_main_menu()
     # If not login, player only have choice to play offline or go back to Sync menu
     if read_data("isFirebaseConnected") == "False":
-        show_widget(account_prompt, 500, 380)
-        show_widget(sync_prompt, 520, 400)
-        show_widget(go_to_sync, 1015, 683)
-        show_widget(offline_button, 700, 683)
+        showWidgetList = [[account_prompt, 500, 380], [sync_prompt, 520, 400], [go_to_sync, 1015, 683], [offline_button, 700, 683]]
+        for widget in range(len(showWidgetList)):
+            show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
     else:
         difficulty_select(event)
 
@@ -195,30 +190,27 @@ def sync(event):
         hideWidgetList = [go_to_sync, sync_prompt, offline_button]
         for widget in hideWidgetList:
             hide_widget(widget)
-        show_widget(account_prompt, 500, 380)
-        show_widget(account_text, 520, 400)
-        show_widget(create_button, 700, 683)
-        show_widget(login_button, 1015, 683)
+        showWidgetList = [[account_prompt, 500, 380], [account_text, 520, 400], [create_button, 700, 683], [login_button, 1015, 683]]
+        for widget in range(len(showWidgetList)):
+            show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
     else:
-        show_widget(account_prompt, 500, 380)
-        show_widget(logout_prompt, 555, 500)
-        show_widget(logout_button, 700, 683)
-        show_widget(cancel_logout_button, 1015, 683)
+        showWidgetList = [[account_prompt, 500, 380], [logout_prompt, 555, 500], [logout_button, 700, 683], [cancel_logout_button, 1015, 683]]
+        for widget in range(len(showWidgetList)):
+            show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
 
 
 # When user presses Profile button
 def profile(event):
     if read_data("isFirebaseConnected") == "False":
-        show_widget(account_prompt, 500, 380)
-        show_widget(no_sync, 650, 550)
-        show_widget(ok_button, 860, 683)
+        showWidgetList = [[account_prompt, 500, 380], [no_sync, 650, 550], [ok_button, 860, 683]]
+        for widget in range(len(showWidgetList)):
+            show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
     else:
         out_main_menu()
-        show_widget(diag_box, 227, 200)
-        show_widget(profile_name, 1000, 250)
-        show_widget(profile_stat, 1000, 400)
-        show_widget(profile_stat_game, 1245, 400)
-        show_widget(change_gender_button, 248, 840)
+        showWidgetList = [[diag_box, 227, 200], [profile_name, 1000, 250], [profile_stat, 1000, 400], [profile_stat_game, 1245, 400], 
+                        [change_gender_button, 248, 840]]
+        for widget in range(len(showWidgetList)):
+            show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
         profile_name.config(text=read_data("firebaseUsername"))
         profile_stat_game.config(text=sum_times_played(read_data("firebaseUsername")) + "\n" + 
             str(db.reference('Users/' + read_data("firebaseUsername") + '/TimesPlayed/Easy').get()) + " (Fastest : " + 
@@ -249,9 +241,9 @@ def about(event):
 
 # When user presses Exit button
 def close_confirmation(event):
-    show_widget(exit_confirm, 525, 450)
-    show_widget(exit_yes_button, 720, 570)
-    show_widget(exit_no_button, 1000, 570)
+    showWidgetList = [[exit_confirm, 525, 450], [exit_yes_button, 720, 570], [exit_no_button, 1000, 570]]
+    for widget in range(len(showWidgetList)):
+        show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
     exit_confirm.lift()
     exit_yes_button.lift()
     exit_no_button.lift()
@@ -280,12 +272,10 @@ def create_account(event):
         hideWidgetList = [offline_button, login_button, account_text, back_button]
         for widget in hideWidgetList:
             hide_widget(widget)
-        show_widget(create_button, 1188, 683)
-        show_widget(create_acc, 520, 470)
-        show_widget(back_auth_button, 520, 400)
-        show_widget(username, 900, 470)
-        show_widget(password, 900, 535)
-        show_widget(password_confirm, 900, 602)
+        showWidgetList = [[create_button, 1188, 683], [create_acc, 520, 470], [back_auth_button, 520, 400], [username, 900, 470], 
+                        [password, 900, 535], [password_confirm, 900, 602]]
+        for widget in range(len(showWidgetList)):
+            show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
         write_data("isUserInCredentialScreen", "True")
     else:
         # Check login credential
@@ -308,11 +298,9 @@ def login_account(event):
         hideWidgetList = [offline_button, create_button, account_text, back_button]
         for widget in hideWidgetList:
             hide_widget(widget)
-        show_widget(login_button, 1188, 683)
-        show_widget(login_auth, 590, 520)
-        show_widget(back_auth_button, 520, 400)
-        show_widget(username, 820, 520)
-        show_widget(password, 820, 585)
+        showWidgetList = [[login_button, 1188, 683], [login_auth, 590, 520], [back_auth_button, 520, 400], [username, 820, 520], [password, 820, 585]]
+        for widget in range(len(showWidgetList)):
+            show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
         write_data("isUserInCredentialScreen", "True")
     else:
         # Check login credential
@@ -327,10 +315,10 @@ def login_account(event):
             hideWidgetList = [auth_message, login_button, login_auth, back_auth_button, username, password]
             for widget in hideWidgetList:
                 hide_widget(widget)
-            write_data("isFirebaseConnected", "True")
-            write_data("firebaseUsername", username.get())
             show_widget(ok_button, 860, 683)
             show_widget(login_success, 800, 420)
+            write_data("isFirebaseConnected", "True")
+            write_data("firebaseUsername", username.get())
             write_data("isUserInCredentialScreen", "False") 
             login_success.config(text = "Login successful! \n\n  Username : " + username.get() + "\nHave a nice day!", fg = "green")
             username.delete(0, 'end')
@@ -367,16 +355,13 @@ def change_gender(event):
 
 # Prompt user to select difficulty
 def difficulty_select(event):
-    hideWidgetList = [account_prompt, sync_prompt, go_to_sync]
+    hideWidgetList = [account_prompt, sync_prompt, go_to_sync, offline_button]
     for widget in hideWidgetList:
         hide_widget(widget)
-    hide_widget(offline_button)
-    show_widget(diag_box, 227, 200)
-    show_widget(select_difficulty, 289, 254)
-    show_widget(easy_difficulty_button, 315, 418)
-    show_widget(normal_difficulty_button, 650, 418)
-    show_widget(hard_difficulty_button, 986, 418)
-    show_widget(expert_difficulty_button, 1322, 418)
+    showWidgetList = [[diag_box, 227, 200], [select_difficulty, 289, 254], [easy_difficulty_button, 315, 418], 
+                    [normal_difficulty_button, 650, 418], [hard_difficulty_button, 986, 418], [expert_difficulty_button, 1322, 418]]
+    for widget in range(len(showWidgetList)):
+            show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
 
 
 # When user want to go to MainMenu while game is in progress
@@ -440,7 +425,7 @@ def expert_gamemode(event):
     start_game()
 
 
-# Countdown (Edited from https://www.geeksforgeeks.org/how-to-create-a-countdown-timer-using-python/)
+# Countdown
 def countdown_timer(t):
     winsound.PlaySound(None, winsound.SND_PURGE)
     show_widget(pre_countdown, 580, 520)

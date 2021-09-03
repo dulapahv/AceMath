@@ -8,6 +8,6 @@ isGameStarted = False
 isStopwatchPaused = False
 isUserInGame = False
 currentQuestionNumber = 0
-answer = 6
+answer = 12
 minInteger = 0
 maxInteger = 9
