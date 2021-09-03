@@ -494,13 +494,13 @@ def summon_integer():
         hideWidgetList = [back_button, rand_int_text, user_answer]
         for widget in hideWidgetList:
             hide_widget(widget)
+        show_widget(finish_game, 840, 770)
+        show_widget(pre_countdown, 420, 450)
         stopwatch.stop()
         winsound.PlaySound('data/sounds/GameFinish.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
         write_data("currentQuestionNumber", 0)
         write_data("isUserInGame", "False")
         write_data("isGameStarted", "False")
-        show_widget(finish_game, 840, 770)
-        show_widget(pre_countdown, 420, 450)
         pre_countdown.config(text = "Your time is " + str(stopwatch) + "\nKeep on trying!")
         user_answer.delete(0, 'end')
         submit_score()
@@ -524,7 +524,7 @@ def submit_score():
         user.update({read_data("firebaseUsername") + '/TimesPlayed/' + read_data("selectedDifficulty"): played,})
         best_time_prev = db.reference('Users/' + read_data("firebaseUsername") + '/FastestTime/' + read_data("selectedDifficulty") + 'Value')
         if stopwatch.duration < best_time_prev.get():
-            pre_countdown.config(text="Congratulations!" + "\n" + "Your time is " + str(stopwatch) + "\nNew Record!", fg = "green")
+            pre_countdown.config(text = "Congratulations!" + "\n" + "Your time is " + str(stopwatch) + "\nNew Record!", fg = "green")
             user.update({
                 read_data("firebaseUsername") + '/FastestTime/' + read_data("selectedDifficulty"): str(stopwatch),
                 read_data("firebaseUsername") + '/FastestTime/' + read_data("selectedDifficulty") + 'Value': stopwatch.duration
@@ -557,7 +557,7 @@ write_data("currentQuestionNumber", 0)
 
 
 ### Create background ###
-BGFullCanvas = Canvas(MainWindow, width=1920, height=1080)
+BGFullCanvas = Canvas(MainWindow, width = 1920, height = 1080)
 BGFullCanvas.pack()
 BGFull = ImageTk.PhotoImage(Image.open("data/images/BGFull.jpg"))
 BGFullCanvas.create_image(0, 0, anchor = NW, image = BGFull)
