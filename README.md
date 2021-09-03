@@ -1,5 +1,5 @@
 # AceMath
-Immerse yourself into a challenging world of mathematics. Solve the problems as fast as you can to earn yourself a new record. 4 Difficulties are available for people who seek even more challenges with up to 40 questions in a single game. Play the game anywhere, any time you want with the sync features, making sure that you will be able to earn a new record at your will.
+Immerse yourself into a challenging world of mathematics. Solve the problems as fast as you can to earn yourself a new record. 4 Difficulties are available for people who seek even more challenges with up to 40 questions in a single game. Play the game anywhere, anytime you want with the sync features, making sure that you can earn a new record anywhere and anytime.
 
 Download the game at AceMath_by_n0miya.zip or https://drive.google.com/file/d/1le9mvw0xnNOfK3qpaWOid894Osc4gVc7/view?usp=sharing
 
