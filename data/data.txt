@@ -1,12 +1,12 @@
 isFirebaseConnected = False
 firebaseUsername = null
 isUserInCredentialScreen = False
-selectedDifficulty = null
-questionSize = 0
+selectedDifficulty = Expert
+questionSize = 19
 isGameStarted = False
 isStopwatchPaused = False
 isUserInGame = False
 currentQuestionNumber = 0
-answer = 0
-minInteger = 0
-maxInteger = 0
+answer = 14734
+minInteger = 1000
+maxInteger = 9999

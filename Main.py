@@ -10,10 +10,17 @@
 #  Written by: Dulapah Vibulsanti (64011388)                    #
 #===============================================================#
 
-import tkinter, winsound, random, time
+import winsound, random, time
 from tkinter import Canvas, PhotoImage, Button, Label, Entry, Tk, font
 from firebase_admin import initialize_app, credentials, db
 from PIL import ImageTk, Image
+
+#--[Firebase Database Credential and Path]---------------------------------------
+cred = credentials.Certificate('data/acemath-n0miya-firebase-adminsdk-yft0t-e8061fb0b1.json')
+initialize_app(cred, {'databaseURL': 'https://acemath-n0miya-default-rtdb.asia-southeast1.firebasedatabase.app/'})
+
+#--[Program Data Path]---------------------------------------
+data = "data/"
 
 class AceMath(Tk):
     def __init__(self):
@@ -27,7 +34,7 @@ class AceMath(Tk):
         self.title('AcΣMαth')
         self.geometry("1920x1080")
         self.attributes('-fullscreen', True)
-        self.wm_iconbitmap('data/images/AceMath.ico')
+        self.wm_iconbitmap(data + 'images/AceMath.ico')
         self.bind('<F11>', self.fullscreen)
         self.bind('<Escape>', self.close_confirmation)
         self.write_data("isUserInCredentialScreen", "False")
@@ -43,46 +50,46 @@ class AceMath(Tk):
         #--[Background Image]-----------------------------------------------------
         self.BGFullCanvas = Canvas(self, width = 1920, height = 1080)
         self.BGFullCanvas.pack()
-        self.BGFull = ImageTk.PhotoImage(Image.open("data/images/BGFull.jpg"))
+        self.BGFull = ImageTk.PhotoImage(Image.open(data + "images/BGFull.jpg"))
         self.BGFullCanvas.create_image(0, 0, anchor = "nw", image = self.BGFull)
 
         self.BGCanvas = Canvas(self, width = 1920, height = 1080)
         self.BGCanvas.pack()
-        self.BG = ImageTk.PhotoImage(Image.open("data/images/BG.jpg"))
+        self.BG = ImageTk.PhotoImage(Image.open(data + "images/BG.jpg"))
         self.BGCanvas.create_image(0, 0, anchor = "nw", image = self.BG)
 
         #--[Play Button]----------------------------------------------------------
-        self.PlayButtonBG = PhotoImage(file = "data/images/Play.png")
+        self.PlayButtonBG = PhotoImage(file = data + "images/Play.png")
         self.play_button = Button(self, width = 274, height = 109, image = self.PlayButtonBG, borderwidth = 0)
         self.play_button.place(x = 80, y = 425)
         self.play_button.bind('<Button-1>', self.play)
 
         #--[Sync Button]----------------------------------------------------------
-        self.SyncButtonBG = PhotoImage(file = "data/images/Sync.png")
+        self.SyncButtonBG = PhotoImage(file = data + "images/Sync.png")
         self.sync_button = Button(self, width = 276, height = 107, image = self.SyncButtonBG, borderwidth = 0)
         self.sync_button.place(x = 80, y = 558)
         self.sync_button.bind('<Button-1>', self.sync)
 
         #--[Profile Button]-------------------------------------------------------
-        self.ProfileButtonBG = PhotoImage(file = "data/images/Profile.png")
+        self.ProfileButtonBG = PhotoImage(file = data + "images/Profile.png")
         self.profile_button = Button(self, width = 363, height = 94, image = self.ProfileButtonBG, borderwidth = 0)
         self.profile_button.place(x = 80, y = 690)
         self.profile_button.bind('<Button-1>', self.profile)
 
         #--[About Button]---------------------------------------------------------
-        self.AboutButtonBG = PhotoImage(file = "data/images/About.png")
+        self.AboutButtonBG = PhotoImage(file = data + "images/About.png")
         self.about_button = Button(self, width = 335, height = 90, image = self.AboutButtonBG, borderwidth = 0)
         self.about_button.place(x = 80, y = 810)
         self.about_button.bind('<Button-1>', self.about)
 
         #--[Exit Button]----------------------------------------------------------
-        self.ExitButtonBG = PhotoImage(file = "data/images/Exit.png")
+        self.ExitButtonBG = PhotoImage(file = data + "images/Exit.png")
         self.exit_button = Button(self, width = 252, height = 87, image = self.ExitButtonBG, borderwidth = 0)
         self.exit_button.place(x = 80, y = 923)
         self.exit_button.bind('<Button-1>', self.close_confirmation)
 
         #--[Back Button]----------------------------------------------------------
-        self.BackButtonBG = PhotoImage(file="data/images/Back.png")
+        self.BackButtonBG = PhotoImage(file=data + "images/Back.png")
         self.back_button = Button(self, width = 314, height = 95, image = self.BackButtonBG, borderwidth = 0)
         self.back_button.bind('<Button-1>', self.to_main_menu)
         self.hide_widget(self.back_button)
@@ -90,65 +97,65 @@ class AceMath(Tk):
         #--[About Description]----------------------------------------------------
         self.AboutCanvas = Canvas(self, width = 1920, height = 1080)
         self.AboutCanvas.pack()
-        self.About = ImageTk.PhotoImage(Image.open("data/images/AboutMe.jpg"))
+        self.About = ImageTk.PhotoImage(Image.open(data + "images/AboutMe.jpg"))
         self.AboutCanvas.create_image(0, 0, anchor = "nw", image = self.About)
         self.hide_canvas(self.AboutCanvas)
 
         #--[Exit Confirmation Dialog]---------------------------------------------
-        self.ExitConfirmDiagBG = Image.open("data/images/ExitDiag.png")
+        self.ExitConfirmDiagBG = Image.open(data + "images/ExitDiag.png")
         self.ExitConfirmBG = ImageTk.PhotoImage(self.ExitConfirmDiagBG)
-        self.exit_confirm = tkinter.Label(image = self.ExitConfirmBG)
+        self.exit_confirm = Label(image = self.ExitConfirmBG)
         self.hide_widget(self.exit_confirm)
 
-        self.ExitYesButtonBG = PhotoImage(file = "data/images/Yes.png")
+        self.ExitYesButtonBG = PhotoImage(file = data + "images/Yes.png")
         self.exit_yes_button = Button(self, width = 241, height = 61, image = self.ExitYesButtonBG, borderwidth = 0)
         self.exit_yes_button.bind('<Button-1>', self.close)
         self.hide_widget(self.exit_yes_button)
 
-        self.ExitNoButtonBG = PhotoImage(file = "data/images/No.png")
+        self.ExitNoButtonBG = PhotoImage(file = data + "images/No.png")
         self.exit_no_button = Button(self, width = 241, height = 61, image = self.ExitNoButtonBG, borderwidth = 0)
         self.exit_no_button.bind('<Button-1>', self.cancel)
         self.hide_widget(self.exit_no_button)
 
         #--[Not Logged in Dialog]-------------------------------------------------
-        self.AccountPrompDiagBG = Image.open("data/images/AccountPrompt.png")
+        self.AccountPrompDiagBG = Image.open(data + "images/AccountPrompt.png")
         self.AccountPrompBG = ImageTk.PhotoImage(self.AccountPrompDiagBG)
-        self.account_prompt = tkinter.Label(image = self.AccountPrompBG)
+        self.account_prompt = Label(image = self.AccountPrompBG)
         self.hide_widget(self.account_prompt)
 
-        self.AccountPrompDiagText = Image.open("data/images/AccountPromptText.png")
+        self.AccountPrompDiagText = Image.open(data + "images/AccountPromptText.png")
         self.AccountPrompText = ImageTk.PhotoImage(self.AccountPrompDiagText)
-        self.account_text = tkinter.Label(image = self.AccountPrompText, borderwidth = 0)
+        self.account_text = Label(image = self.AccountPrompText, borderwidth = 0)
         self.hide_widget(self.account_text)
 
-        self.OfflineButtonBG = PhotoImage(file = "data/images/Offline.png")
+        self.OfflineButtonBG = PhotoImage(file = data + "images/Offline.png")
         self.offline_button = Button(self, width = 239, height = 72, image = self.OfflineButtonBG, borderwidth = 0)
         self.offline_button.bind('<Button-1>', self.play_offline)
         self.hide_widget(self.offline_button)
 
-        self.CreateButtonBG = PhotoImage(file = "data/images/Create.png")
+        self.CreateButtonBG = PhotoImage(file = data + "images/Create.png")
         self.create_button = Button(self, width = 239, height = 72, image = self.CreateButtonBG, borderwidth = 0)
         self.create_button.bind('<Button-1>', self.create_account)
         self.hide_widget(self.create_button)
 
-        self.LoginButtonBG = PhotoImage(file = "data/images/Login.png")
+        self.LoginButtonBG = PhotoImage(file = data + "images/Login.png")
         self.login_button = Button(self, width = 239, height = 72, image = self.LoginButtonBG, borderwidth = 0)
         self.login_button.bind('<Button-1>', self.login_account)
         self.hide_widget(self.login_button)
 
-        self.BackAuthButtonBG = PhotoImage(file = "data/images/Back_Account.png")
+        self.BackAuthButtonBG = PhotoImage(file = data + "images/Back_Account.png")
         self.back_auth_button = Button(self, width = 62, height = 60, image = self.BackAuthButtonBG, borderwidth = 0)
         self.back_auth_button.bind('<Button-1>', self.back_auth)
         self.hide_widget(self.back_auth_button)
 
-        self.LoginAuthText = Image.open("data/images/LoginAuth.png")
+        self.LoginAuthText = Image.open(data + "images/LoginAuth.png")
         self.LoginAuth = ImageTk.PhotoImage(self.LoginAuthText)
-        self.login_auth = tkinter.Label(image = self.LoginAuth, borderwidth = 0)
+        self.login_auth = Label(image = self.LoginAuth, borderwidth = 0)
         self.hide_widget(self.login_auth)
 
-        self.CreateAccText = Image.open("data/images/CreateAcc.png")
+        self.CreateAccText = Image.open(data + "images/CreateAcc.png")
         self.CreateAcc = ImageTk.PhotoImage(self.CreateAccText)
-        self.create_acc = tkinter.Label(image = self.CreateAcc, borderwidth = 0)
+        self.create_acc = Label(image = self.CreateAcc, borderwidth = 0)
         self.hide_widget(self.create_acc)
 
         #--[Input Credential Dialog]----------------------------------------------
@@ -176,20 +183,20 @@ class AceMath(Tk):
         self.hide_widget(self.login_success)
 
         #--[Sync Dialog]----------------------------------------------------------
-        self.SyncPromptText = Image.open("data/images/SyncPromptMsg.png")
+        self.SyncPromptText = Image.open(data + "images/SyncPromptMsg.png")
         self.SyncPrompt = ImageTk.PhotoImage(self.SyncPromptText)
-        self.sync_prompt = tkinter.Label(image = self.SyncPrompt, borderwidth = 0)
+        self.sync_prompt = Label(image = self.SyncPrompt, borderwidth = 0)
         self.hide_widget(self.sync_prompt)
 
-        self.GoToSyncBG = PhotoImage(file = "data/images/SyncContinue.png")
+        self.GoToSyncBG = PhotoImage(file = data + "images/SyncContinue.png")
         self.go_to_sync = Button(self, width = 239, height = 72, image = self.GoToSyncBG, borderwidth = 0)
         self.go_to_sync.bind('<Button-1>', self.sync)
         self.hide_widget(self.go_to_sync)
 
         #--[Logout Dialog]--------------------------------------------------------
-        self.LogoutPromptText = Image.open("data/images/LogoutPrompt.png")
+        self.LogoutPromptText = Image.open(data + "images/LogoutPrompt.png")
         self.LogoutPrompt = ImageTk.PhotoImage(self.LogoutPromptText)
-        self.logout_prompt = tkinter.Label(image = self.LogoutPrompt, borderwidth = 0)
+        self.logout_prompt = Label(image = self.LogoutPrompt, borderwidth = 0)
         self.hide_widget(self.logout_prompt)
 
         self.logout_button = Button(self, width = 241, height = 61, image = self.ExitYesButtonBG, borderwidth = 0)
@@ -201,20 +208,20 @@ class AceMath(Tk):
         self.hide_widget(self.cancel_logout_button)
 
         #--[Not Logged in Error Dialog]-------------------------------------------
-        self.NoSyncText = Image.open("data/images/NoSync.png")
+        self.NoSyncText = Image.open(data + "images/NoSync.png")
         self.NoSync = ImageTk.PhotoImage(self.NoSyncText)
-        self.no_sync = tkinter.Label(image = self.NoSync, borderwidth = 0)
+        self.no_sync = Label(image = self.NoSync, borderwidth = 0)
         self.hide_widget(self.no_sync)
 
-        self.OkButtonBG = PhotoImage(file = "data/images/Ok.png")
+        self.OkButtonBG = PhotoImage(file = data + "images/Ok.png")
         self.ok_button = Button(self, width = 241, height = 61, image = self.OkButtonBG, borderwidth = 0)
         self.ok_button.bind('<Button-1>', self.login_affirm)
         self.hide_widget(self.ok_button)
 
         #--[User Profile Page]----------------------------------------------------
-        self.DiagBoxBG = Image.open("data/images/DiagBox.png")
+        self.DiagBoxBG = Image.open(data + "images/DiagBox.png")
         self.DiagBox = ImageTk.PhotoImage(self.DiagBoxBG)
-        self.diag_box = tkinter.Label(image = self.DiagBox, borderwidth = 0)
+        self.diag_box = Label(image = self.DiagBox, borderwidth = 0)
         self.hide_widget(self.diag_box)
 
         self.profile_name = Label(self, justify = 'left')
@@ -232,43 +239,43 @@ class AceMath(Tk):
         self.profile_stat_game.config(font = ("Segoe UI", 28))
         self.hide_widget(self.profile_stat_game)
 
-        self.MaleProfilePicBG = Image.open("data/images/Male.png")
+        self.MaleProfilePicBG = Image.open(data + "images/Male.png")
         self.MaleProfilePic = ImageTk.PhotoImage(self.MaleProfilePicBG)
-        self.male_profile_pic = tkinter.Label(image = self.MaleProfilePic, borderwidth = 0)
+        self.male_profile_pic = Label(image = self.MaleProfilePic, borderwidth = 0)
         self.hide_widget(self.male_profile_pic)
 
-        self.FemaleProfilePicBG = Image.open("data/images/Female.png")
+        self.FemaleProfilePicBG = Image.open(data + "images/Female.png")
         self.FemaleProfilePic = ImageTk.PhotoImage(self.FemaleProfilePicBG)
-        self.female_profile_pic = tkinter.Label(image = self.FemaleProfilePic, borderwidth = 0)
+        self.female_profile_pic = Label(image = self.FemaleProfilePic, borderwidth = 0)
         self.hide_widget(self.female_profile_pic)
 
-        self.ChangeGenderBG = PhotoImage(file = "data/images/Gender.png")
+        self.ChangeGenderBG = PhotoImage(file = data + "images/Gender.png")
         self.change_gender_button = Button(self, width = 76, height = 76, image = self.ChangeGenderBG, borderwidth = 0)
         self.change_gender_button.bind('<Button-1>', self.change_gender)
         self.hide_widget(self.change_gender_button)
 
         #--[Difficulty Selection Page]--------------------------------------------
-        self.SelectDifficultyBG = Image.open("data/images/SelectDifficulty.png")
+        self.SelectDifficultyBG = Image.open(data + "images/SelectDifficulty.png")
         self.SelectDifficulty = ImageTk.PhotoImage(self.SelectDifficultyBG)
-        self.select_difficulty = tkinter.Label(image = self.SelectDifficulty, borderwidth = 0)
+        self.select_difficulty = Label(image = self.SelectDifficulty, borderwidth = 0)
         self.hide_widget(self.select_difficulty)
 
-        self.EasyDifficultyBG = PhotoImage(file = "data/images/Easy.png")
+        self.EasyDifficultyBG = PhotoImage(file = data + "images/Easy.png")
         self.easy_difficulty_button = Button(self, width = 288, height = 418, image = self.EasyDifficultyBG, borderwidth = 0)
         self.easy_difficulty_button.bind('<Button-1>', self.easy_gamemode)
         self.hide_widget(self.easy_difficulty_button)
 
-        self.NormalDifficultyBG = PhotoImage(file = "data/images/Normal.png")
+        self.NormalDifficultyBG = PhotoImage(file = data + "images/Normal.png")
         self.normal_difficulty_button = Button(self, width = 288, height = 418, image = self.NormalDifficultyBG, borderwidth = 0)
         self.normal_difficulty_button.bind('<Button-1>', self.normal_gamemode)
         self.hide_widget(self.normal_difficulty_button)
 
-        self.HardDifficultyBG = PhotoImage(file = "data/images/Hard.png")
+        self.HardDifficultyBG = PhotoImage(file = data + "images/Hard.png")
         self.hard_difficulty_button = Button(self, width = 288, height = 418, image = self.HardDifficultyBG, borderwidth = 0)
         self.hard_difficulty_button.bind('<Button-1>', self.hard_gamemode)
         self.hide_widget(self.hard_difficulty_button)
 
-        self.ExpertDifficultyBG = PhotoImage(file = "data/images/Expert.png")
+        self.ExpertDifficultyBG = PhotoImage(file = data + "images/Expert.png")
         self.expert_difficulty_button = Button(self, width = 288, height = 418, image = self.ExpertDifficultyBG, borderwidth = 0)
         self.expert_difficulty_button.bind('<Button-1>', self.expert_gamemode)
         self.hide_widget(self.expert_difficulty_button)
@@ -293,23 +300,23 @@ class AceMath(Tk):
         self.hide_widget(self.user_answer)
 
         #--[Cancel Ongoing Game Dialog]-------------------------------------------
-        self.CancelGameBG = Image.open("data/images/CancelGame.png")
+        self.CancelGameBG = Image.open(data + "images/CancelGame.png")
         self.CancelGame = ImageTk.PhotoImage(self.CancelGameBG)
-        self.cancel_game = tkinter.Label(image = self.CancelGame, borderwidth = 0)
+        self.cancel_game = Label(image = self.CancelGame, borderwidth = 0)
         self.hide_widget(self.cancel_game)
 
-        self.CancelGameYes = PhotoImage(file = "data/images/Yes.png")
+        self.CancelGameYes = PhotoImage(file = data + "images/Yes.png")
         self.cancel_game_yes = Button(self, width = 241, height = 61, image = self.CancelGameYes, borderwidth = 0)
         self.cancel_game_yes.bind('<Button-1>', self.prompt_exit)
         self.hide_widget(self.cancel_game_yes)
 
-        self.CancelGameNo = PhotoImage(file = "data/images/No.png")
+        self.CancelGameNo = PhotoImage(file = data + "images/No.png")
         self.cancel_game_no = Button(self, width = 241, height = 61, image = self.CancelGameNo, borderwidth = 0)
         self.cancel_game_no.bind('<Button-1>', self.prompt_exit_cancel)
         self.hide_widget(self.cancel_game_no)
 
         #--[Result Affirm Button]-------------------------------------------------
-        self.FinishGame = PhotoImage(file = "data/images/Ok.png")
+        self.FinishGame = PhotoImage(file = data + "images/Ok.png")
         self.finish_game = Button(self, width = 241, height = 61, image = self.FinishGame, borderwidth = 0)
         self.finish_game.bind('<Button-1>', self.ok_result)
         self.hide_widget(self.finish_game)
@@ -317,10 +324,6 @@ class AceMath(Tk):
     #-------------------------------------------------------------------------
     # Database
     #-------------------------------------------------------------------------
-    #--[Authenticate Firebase Database]---------------------------------------
-    cred = credentials.Certificate('data/acemath-n0miya-firebase-adminsdk-yft0t-e8061fb0b1.json')
-    initialize_app(cred, {'databaseURL': 'https://acemath-n0miya-default-rtdb.asia-southeast1.firebasedatabase.app/'})
-
     #--[Create New User in Firebase Database]---------------------------------
     def create_new_user(self, user_name, user_password):
         user = db.reference('Users')
@@ -344,7 +347,6 @@ class AceMath(Tk):
                 'ExpertValue': 999999999,
             }
         })
-
 
     #--[Write Data to Firebase Database]--------------------------------------
     def write_to_firebase(self, user_name, child, data):
@@ -387,7 +389,7 @@ class AceMath(Tk):
     #--[Search and Get Value in data.txt]-------------------------------------
     def read_data(self, string_to_search):
         lineNumber = 0
-        with open("data/data.txt", 'r') as read_obj:
+        with open(data + "data.txt", 'r') as read_obj:
             for line in read_obj:
                 lineNumber += 1
                 if string_to_search in line:
@@ -398,10 +400,10 @@ class AceMath(Tk):
     #--[Search and Replace Value in data.txt]---------------------------------
     def write_data(self, string_to_search, value):
         lineNumber = 0
-        with open("data/data.txt", 'r') as read_obj:
+        with open(data + "data.txt", 'r') as read_obj:
             filedata = read_obj.read()
             filedata = filedata.replace(string_to_search + " = " + self.read_data(string_to_search), string_to_search + " = " + str(value))
-        with open("data/data.txt", 'w') as read_obj:
+        with open(data + "data.txt", 'w') as read_obj:
             read_obj.write(filedata)
         read_obj.close()
 
@@ -415,8 +417,10 @@ class AceMath(Tk):
         else:
             self.attributes('-fullscreen', False)
 
+    #--[Moving out of MainMenu Event]-------------------------------------
     def out_main_menu(self):
-        hideWidgetList = [self.play_button, self.sync_button, self.profile_button, self.about_button, self.exit_button, self.exit_confirm, self.exit_no_button, self.exit_yes_button]
+        hideWidgetList = [self.play_button, self.sync_button, self.profile_button, self.about_button, self.exit_button, self.exit_confirm, self.exit_no_button, 
+                        self.exit_yes_button, self.account_prompt, self.no_sync, self.ok_button]
         for widget in hideWidgetList:
             self.hide_widget(widget)
         self.show_widget(self.back_button, 80, 20)
@@ -466,7 +470,7 @@ class AceMath(Tk):
     #--[Check if User Logged in]----------------------------------------------
     def play(self, event):
         self.out_main_menu()
-        # If not login, player only have choice to play offline or go back to Sync menu
+        # If not login, prompt player to play offline or go back to Sync menu
         if self.read_data("isFirebaseConnected") == "False":
             showWidgetList = [[self.account_prompt, 500, 380], [self.sync_prompt, 520, 400], [self.go_to_sync, 1015, 683], [self.offline_button, 700, 683]]
             for widget in range(len(showWidgetList)):
@@ -771,6 +775,9 @@ class AceMath(Tk):
 
     #--[EXIT PROGRAM Confirmation Dialog]-------------------------------------
     def close_confirmation(self, event):
+        hideWidgetList = [self.account_prompt, self.no_sync, self.ok_button]
+        for widget in hideWidgetList:
+            self.hide_widget(widget)
         showWidgetList = [[self.exit_confirm, 525, 450], [self.exit_yes_button, 720, 570], [self.exit_no_button, 1000, 570]]
         for widget in range(len(showWidgetList)):
             self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
