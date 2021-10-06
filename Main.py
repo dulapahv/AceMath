@@ -14,7 +14,7 @@ import tkinter
 import winsound
 import random
 import time
-from tkinter import Canvas, PhotoImage, Button, Label, font, Entry, Tk
+from tkinter import Canvas, PhotoImage, Button, Label, Entry, Tk, font
 from firebase_admin import initialize_app, credentials, db
 from PIL import ImageTk, Image
 
