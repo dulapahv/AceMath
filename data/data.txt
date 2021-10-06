@@ -3,7 +3,6 @@ firebaseUsername = null
 isUserInCredentialScreen = False
 selectedDifficulty = null
 questionSize = 0
-integerSize = 0
 isGameStarted = False
 isStopwatchPaused = False
 isUserInGame = False
