@@ -10,19 +10,793 @@
 #  Written by: Dulapah Vibulsanti (64011388)                    #
 #===============================================================#
 
-import tkinter
-import winsound
-import random
-import time
+import tkinter, winsound, random, time
 from tkinter import Canvas, PhotoImage, Button, Label, Entry, Tk, font
 from firebase_admin import initialize_app, credentials, db
 from PIL import ImageTk, Image
 
+class AceMath(Tk):
+    def __init__(self):
+        super().__init__()
+
+        self.stopwatch = Stopwatch()
+
+        #-------------------------------------------------------------------------
+        # Program Configuration
+        #-------------------------------------------------------------------------
+        self.title('AcΣMαth')
+        self.geometry("1920x1080")
+        self.attributes('-fullscreen', True)
+        self.wm_iconbitmap('data/images/AceMath.ico')
+        self.bind('<F11>', self.fullscreen)
+        self.bind('<Escape>', self.close_confirmation)
+        self.write_data("isUserInCredentialScreen", "False")
+        self.write_data("isGameStarted", "False")
+        self.write_data("isStopwatchPaused", "False")
+        self.write_data("isUserInGame", "False")
+        self.write_data("currentQuestionNumber", 0)
+        winsound.PlaySound('data/sounds/BGMusic.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
+
+        #-------------------------------------------------------------------------
+        # Assets Initialization
+        #-------------------------------------------------------------------------
+        #--[Background Image]-----------------------------------------------------
+        self.BGFullCanvas = Canvas(self, width = 1920, height = 1080)
+        self.BGFullCanvas.pack()
+        self.BGFull = ImageTk.PhotoImage(Image.open("data/images/BGFull.jpg"))
+        self.BGFullCanvas.create_image(0, 0, anchor = "nw", image = self.BGFull)
+
+        self.BGCanvas = Canvas(self, width = 1920, height = 1080)
+        self.BGCanvas.pack()
+        self.BG = ImageTk.PhotoImage(Image.open("data/images/BG.jpg"))
+        self.BGCanvas.create_image(0, 0, anchor = "nw", image = self.BG)
+
+        #--[Play Button]----------------------------------------------------------
+        self.PlayButtonBG = PhotoImage(file = "data/images/Play.png")
+        self.play_button = Button(self, width = 274, height = 109, image = self.PlayButtonBG, borderwidth = 0)
+        self.play_button.place(x = 80, y = 425)
+        self.play_button.bind('<Button-1>', self.play)
+
+        #--[Sync Button]----------------------------------------------------------
+        self.SyncButtonBG = PhotoImage(file = "data/images/Sync.png")
+        self.sync_button = Button(self, width = 276, height = 107, image = self.SyncButtonBG, borderwidth = 0)
+        self.sync_button.place(x = 80, y = 558)
+        self.sync_button.bind('<Button-1>', self.sync)
+
+        #--[Profile Button]-------------------------------------------------------
+        self.ProfileButtonBG = PhotoImage(file = "data/images/Profile.png")
+        self.profile_button = Button(self, width = 363, height = 94, image = self.ProfileButtonBG, borderwidth = 0)
+        self.profile_button.place(x = 80, y = 690)
+        self.profile_button.bind('<Button-1>', self.profile)
+
+        #--[About Button]---------------------------------------------------------
+        self.AboutButtonBG = PhotoImage(file = "data/images/About.png")
+        self.about_button = Button(self, width = 335, height = 90, image = self.AboutButtonBG, borderwidth = 0)
+        self.about_button.place(x = 80, y = 810)
+        self.about_button.bind('<Button-1>', self.about)
+
+        #--[Exit Button]----------------------------------------------------------
+        self.ExitButtonBG = PhotoImage(file = "data/images/Exit.png")
+        self.exit_button = Button(self, width = 252, height = 87, image = self.ExitButtonBG, borderwidth = 0)
+        self.exit_button.place(x = 80, y = 923)
+        self.exit_button.bind('<Button-1>', self.close_confirmation)
+
+        #--[Back Button]----------------------------------------------------------
+        self.BackButtonBG = PhotoImage(file="data/images/Back.png")
+        self.back_button = Button(self, width = 314, height = 95, image = self.BackButtonBG, borderwidth = 0)
+        self.back_button.bind('<Button-1>', self.to_main_menu)
+        self.hide_widget(self.back_button)
+
+        #--[About Description]----------------------------------------------------
+        self.AboutCanvas = Canvas(self, width = 1920, height = 1080)
+        self.AboutCanvas.pack()
+        self.About = ImageTk.PhotoImage(Image.open("data/images/AboutMe.jpg"))
+        self.AboutCanvas.create_image(0, 0, anchor = "nw", image = self.About)
+        self.hide_canvas(self.AboutCanvas)
+
+        #--[Exit Confirmation Dialog]---------------------------------------------
+        self.ExitConfirmDiagBG = Image.open("data/images/ExitDiag.png")
+        self.ExitConfirmBG = ImageTk.PhotoImage(self.ExitConfirmDiagBG)
+        self.exit_confirm = tkinter.Label(image = self.ExitConfirmBG)
+        self.hide_widget(self.exit_confirm)
+
+        self.ExitYesButtonBG = PhotoImage(file = "data/images/Yes.png")
+        self.exit_yes_button = Button(self, width = 241, height = 61, image = self.ExitYesButtonBG, borderwidth = 0)
+        self.exit_yes_button.bind('<Button-1>', self.close)
+        self.hide_widget(self.exit_yes_button)
+
+        self.ExitNoButtonBG = PhotoImage(file = "data/images/No.png")
+        self.exit_no_button = Button(self, width = 241, height = 61, image = self.ExitNoButtonBG, borderwidth = 0)
+        self.exit_no_button.bind('<Button-1>', self.cancel)
+        self.hide_widget(self.exit_no_button)
+
+        #--[Not Logged in Dialog]-------------------------------------------------
+        self.AccountPrompDiagBG = Image.open("data/images/AccountPrompt.png")
+        self.AccountPrompBG = ImageTk.PhotoImage(self.AccountPrompDiagBG)
+        self.account_prompt = tkinter.Label(image = self.AccountPrompBG)
+        self.hide_widget(self.account_prompt)
+
+        self.AccountPrompDiagText = Image.open("data/images/AccountPromptText.png")
+        self.AccountPrompText = ImageTk.PhotoImage(self.AccountPrompDiagText)
+        self.account_text = tkinter.Label(image = self.AccountPrompText, borderwidth = 0)
+        self.hide_widget(self.account_text)
+
+        self.OfflineButtonBG = PhotoImage(file = "data/images/Offline.png")
+        self.offline_button = Button(self, width = 239, height = 72, image = self.OfflineButtonBG, borderwidth = 0)
+        self.offline_button.bind('<Button-1>', self.play_offline)
+        self.hide_widget(self.offline_button)
+
+        self.CreateButtonBG = PhotoImage(file = "data/images/Create.png")
+        self.create_button = Button(self, width = 239, height = 72, image = self.CreateButtonBG, borderwidth = 0)
+        self.create_button.bind('<Button-1>', self.create_account)
+        self.hide_widget(self.create_button)
+
+        self.LoginButtonBG = PhotoImage(file = "data/images/Login.png")
+        self.login_button = Button(self, width = 239, height = 72, image = self.LoginButtonBG, borderwidth = 0)
+        self.login_button.bind('<Button-1>', self.login_account)
+        self.hide_widget(self.login_button)
+
+        self.BackAuthButtonBG = PhotoImage(file = "data/images/Back_Account.png")
+        self.back_auth_button = Button(self, width = 62, height = 60, image = self.BackAuthButtonBG, borderwidth = 0)
+        self.back_auth_button.bind('<Button-1>', self.back_auth)
+        self.hide_widget(self.back_auth_button)
+
+        self.LoginAuthText = Image.open("data/images/LoginAuth.png")
+        self.LoginAuth = ImageTk.PhotoImage(self.LoginAuthText)
+        self.login_auth = tkinter.Label(image = self.LoginAuth, borderwidth = 0)
+        self.hide_widget(self.login_auth)
+
+        self.CreateAccText = Image.open("data/images/CreateAcc.png")
+        self.CreateAcc = ImageTk.PhotoImage(self.CreateAccText)
+        self.create_acc = tkinter.Label(image = self.CreateAcc, borderwidth = 0)
+        self.hide_widget(self.create_acc)
+
+        #--[Input Credential Dialog]----------------------------------------------
+        self.custom_font = font.Font(family = 'Segoe UI', size = 20)
+
+        self.username = Entry(self, width = 35)
+        self.username['font'] = self.custom_font
+        self.hide_widget(self.username)
+
+        self.password = Entry(self, width = 35, show = "*")
+        self.password['font'] = self.custom_font
+        self.hide_widget(self.password)
+
+        self.password_confirm = Entry(self, width = 35, show = "*")
+        self.password_confirm['font'] = self.custom_font
+        self.hide_widget(self.password_confirm)
+
+        self.auth_message = Label(self, justify = 'left')
+        self.auth_message['font'] = self.custom_font
+        self.hide_widget(self.auth_message)
+
+        self.login_success = Label(self, anchor = 'c', justify = 'center')
+        self.login_success['font'] = self.custom_font
+        self.login_success.config(font = ("Segoe UI", 28))
+        self.hide_widget(self.login_success)
+
+        #--[Sync Dialog]----------------------------------------------------------
+        self.SyncPromptText = Image.open("data/images/SyncPromptMsg.png")
+        self.SyncPrompt = ImageTk.PhotoImage(self.SyncPromptText)
+        self.sync_prompt = tkinter.Label(image = self.SyncPrompt, borderwidth = 0)
+        self.hide_widget(self.sync_prompt)
+
+        self.GoToSyncBG = PhotoImage(file = "data/images/SyncContinue.png")
+        self.go_to_sync = Button(self, width = 239, height = 72, image = self.GoToSyncBG, borderwidth = 0)
+        self.go_to_sync.bind('<Button-1>', self.sync)
+        self.hide_widget(self.go_to_sync)
+
+        #--[Logout Dialog]--------------------------------------------------------
+        self.LogoutPromptText = Image.open("data/images/LogoutPrompt.png")
+        self.LogoutPrompt = ImageTk.PhotoImage(self.LogoutPromptText)
+        self.logout_prompt = tkinter.Label(image = self.LogoutPrompt, borderwidth = 0)
+        self.hide_widget(self.logout_prompt)
+
+        self.logout_button = Button(self, width = 241, height = 61, image = self.ExitYesButtonBG, borderwidth = 0)
+        self.logout_button.bind('<Button-1>', self.logout)
+        self.hide_widget(self.logout_button)
+
+        self.cancel_logout_button = Button(self, width = 241, height = 61, image = self.ExitNoButtonBG, borderwidth = 0)
+        self.cancel_logout_button.bind('<Button-1>', self.to_main_menu)
+        self.hide_widget(self.cancel_logout_button)
+
+        #--[Not Logged in Error Dialog]-------------------------------------------
+        self.NoSyncText = Image.open("data/images/NoSync.png")
+        self.NoSync = ImageTk.PhotoImage(self.NoSyncText)
+        self.no_sync = tkinter.Label(image = self.NoSync, borderwidth = 0)
+        self.hide_widget(self.no_sync)
+
+        self.OkButtonBG = PhotoImage(file = "data/images/Ok.png")
+        self.ok_button = Button(self, width = 241, height = 61, image = self.OkButtonBG, borderwidth = 0)
+        self.ok_button.bind('<Button-1>', self.login_affirm)
+        self.hide_widget(self.ok_button)
+
+        #--[User Profile Page]----------------------------------------------------
+        self.DiagBoxBG = Image.open("data/images/DiagBox.png")
+        self.DiagBox = ImageTk.PhotoImage(self.DiagBoxBG)
+        self.diag_box = tkinter.Label(image = self.DiagBox, borderwidth = 0)
+        self.hide_widget(self.diag_box)
+
+        self.profile_name = Label(self, justify = 'left')
+        self.profile_name['font'] = self.custom_font
+        self.profile_name.config(font = ("Segoe UI", 44))
+        self.hide_widget(self.profile_name)
+
+        self.profile_stat = Label(self, justify = 'right', text = "Times Played : \nEasy : \nNormal : \nHard : \n Expert : ")
+        self.profile_stat['font'] = self.custom_font
+        self.profile_stat.config(font = ("Segoe UI", 28))
+        self.hide_widget(self.profile_stat)
+
+        self.profile_stat_game = Label(self, justify = 'left')
+        self.profile_stat_game['font'] = self.custom_font
+        self.profile_stat_game.config(font = ("Segoe UI", 28))
+        self.hide_widget(self.profile_stat_game)
+
+        self.MaleProfilePicBG = Image.open("data/images/Male.png")
+        self.MaleProfilePic = ImageTk.PhotoImage(self.MaleProfilePicBG)
+        self.male_profile_pic = tkinter.Label(image = self.MaleProfilePic, borderwidth = 0)
+        self.hide_widget(self.male_profile_pic)
+
+        self.FemaleProfilePicBG = Image.open("data/images/Female.png")
+        self.FemaleProfilePic = ImageTk.PhotoImage(self.FemaleProfilePicBG)
+        self.female_profile_pic = tkinter.Label(image = self.FemaleProfilePic, borderwidth = 0)
+        self.hide_widget(self.female_profile_pic)
+
+        self.ChangeGenderBG = PhotoImage(file = "data/images/Gender.png")
+        self.change_gender_button = Button(self, width = 76, height = 76, image = self.ChangeGenderBG, borderwidth = 0)
+        self.change_gender_button.bind('<Button-1>', self.change_gender)
+        self.hide_widget(self.change_gender_button)
+
+        #--[Difficulty Selection Page]--------------------------------------------
+        self.SelectDifficultyBG = Image.open("data/images/SelectDifficulty.png")
+        self.SelectDifficulty = ImageTk.PhotoImage(self.SelectDifficultyBG)
+        self.select_difficulty = tkinter.Label(image = self.SelectDifficulty, borderwidth = 0)
+        self.hide_widget(self.select_difficulty)
+
+        self.EasyDifficultyBG = PhotoImage(file = "data/images/Easy.png")
+        self.easy_difficulty_button = Button(self, width = 288, height = 418, image = self.EasyDifficultyBG, borderwidth = 0)
+        self.easy_difficulty_button.bind('<Button-1>', self.easy_gamemode)
+        self.hide_widget(self.easy_difficulty_button)
+
+        self.NormalDifficultyBG = PhotoImage(file = "data/images/Normal.png")
+        self.normal_difficulty_button = Button(self, width = 288, height = 418, image = self.NormalDifficultyBG, borderwidth = 0)
+        self.normal_difficulty_button.bind('<Button-1>', self.normal_gamemode)
+        self.hide_widget(self.normal_difficulty_button)
+
+        self.HardDifficultyBG = PhotoImage(file = "data/images/Hard.png")
+        self.hard_difficulty_button = Button(self, width = 288, height = 418, image = self.HardDifficultyBG, borderwidth = 0)
+        self.hard_difficulty_button.bind('<Button-1>', self.hard_gamemode)
+        self.hide_widget(self.hard_difficulty_button)
+
+        self.ExpertDifficultyBG = PhotoImage(file = "data/images/Expert.png")
+        self.expert_difficulty_button = Button(self, width = 288, height = 418, image = self.ExpertDifficultyBG, borderwidth = 0)
+        self.expert_difficulty_button.bind('<Button-1>', self.expert_gamemode)
+        self.hide_widget(self.expert_difficulty_button)
+
+        #--[Pre-Countdown Text]---------------------------------------------------
+        self.pre_countdown = Label(self, width = 25)
+        self.pre_countdown['font'] = self.custom_font
+        self.pre_countdown.config(font = ("Segoe UI", 40))
+        self.hide_widget(self.pre_countdown)
+
+        #--[Random Integer Text]--------------------------------------------------
+        self.rand_int_text = Label(self, width = 15)
+        self.rand_int_text['font'] = self.custom_font
+        self.rand_int_text.config(font = ("Segoe UI", 100))
+        self.hide_widget(self.rand_int_text)
+
+        #--[Answer Field]---------------------------------------------------------
+        self.user_answer = Entry(self, width = 20)
+        self.user_answer['font'] = self.custom_font
+        self.user_answer.config(font = ("Segoe UI", 40))
+        self.user_answer.bind('<Key>', self.check_answer)
+        self.hide_widget(self.user_answer)
+
+        #--[Cancel Ongoing Game Dialog]-------------------------------------------
+        self.CancelGameBG = Image.open("data/images/CancelGame.png")
+        self.CancelGame = ImageTk.PhotoImage(self.CancelGameBG)
+        self.cancel_game = tkinter.Label(image = self.CancelGame, borderwidth = 0)
+        self.hide_widget(self.cancel_game)
+
+        self.CancelGameYes = PhotoImage(file = "data/images/Yes.png")
+        self.cancel_game_yes = Button(self, width = 241, height = 61, image = self.CancelGameYes, borderwidth = 0)
+        self.cancel_game_yes.bind('<Button-1>', self.prompt_exit)
+        self.hide_widget(self.cancel_game_yes)
+
+        self.CancelGameNo = PhotoImage(file = "data/images/No.png")
+        self.cancel_game_no = Button(self, width = 241, height = 61, image = self.CancelGameNo, borderwidth = 0)
+        self.cancel_game_no.bind('<Button-1>', self.prompt_exit_cancel)
+        self.hide_widget(self.cancel_game_no)
+
+        #--[Result Affirm Button]-------------------------------------------------
+        self.FinishGame = PhotoImage(file = "data/images/Ok.png")
+        self.finish_game = Button(self, width = 241, height = 61, image = self.FinishGame, borderwidth = 0)
+        self.finish_game.bind('<Button-1>', self.ok_result)
+        self.hide_widget(self.finish_game)
+
+    #-------------------------------------------------------------------------
+    # Database
+    #-------------------------------------------------------------------------
+    #--[Authenticate Firebase Database]---------------------------------------
+    cred = credentials.Certificate('data/acemath-n0miya-firebase-adminsdk-yft0t-e8061fb0b1.json')
+    initialize_app(cred, {'databaseURL': 'https://acemath-n0miya-default-rtdb.asia-southeast1.firebasedatabase.app/'})
+
+    #--[Create New User in Firebase Database]---------------------------------
+    def create_new_user(self, user_name, user_password):
+        user = db.reference('Users')
+        user.child(user_name).set({
+            'Key': user_password,
+            'Gender': 0,
+            'TimesPlayed': {
+                'Easy': 0,
+                'Normal': 0,
+                'Hard': 0,
+                'Expert': 0,
+            },
+            'FastestTime': {
+                'Easy': "00.00s",
+                'Normal': "00.00s",
+                'Hard': "00.00s",
+                'Expert': "00.00s",
+                'EasyValue': 999999999,
+                'NormalValue': 999999999,
+                'HardValue': 999999999,
+                'ExpertValue': 999999999,
+            }
+        })
+
+
+    #--[Write Data to Firebase Database]--------------------------------------
+    def write_to_firebase(self, user_name, child, data):
+        user = db.reference('Users')
+        user.child(user_name).update({
+            child: data,
+        })
+
+    #--[Get Amount of Times User Has Played]----------------------------------
+    def sum_times_played(self, user_name):
+        easy = db.reference('Users/' + str(user_name) + '/TimesPlayed/Easy').get()
+        normal = db.reference('Users/' + str(user_name) + '/TimesPlayed/Normal').get()
+        hard = db.reference('Users/' + str(user_name) + '/TimesPlayed/Hard').get()
+        expert = db.reference('Users/' + str(user_name) + '/TimesPlayed/Expert').get()
+        sum_played = easy + normal + hard + expert
+        return str(sum_played)
+
+    #-------------------------------------------------------------------------
+    # Canvas and Widget Management
+    #-------------------------------------------------------------------------
+    #--[Hide Canvas]----------------------------------------------------------
+    def hide_canvas(self, canvas):
+        canvas.pack_forget()
+
+    #--[Show Canvas]----------------------------------------------------------
+    def show_canvas(self, canvas):
+        canvas.pack()
+
+    #--[Hide Widget]----------------------------------------------------------
+    def hide_widget(self, widget):
+        widget.place_forget()
+
+    #--[Show Widget]----------------------------------------------------------
+    def show_widget(self, widget, x_coordinate, y_coordinate):
+        widget.place(x = x_coordinate, y = y_coordinate)
+
+    #-------------------------------------------------------------------------
+    # Accessing data.txt
+    #-------------------------------------------------------------------------
+    #--[Search and Get Value in data.txt]-------------------------------------
+    def read_data(self, string_to_search):
+        lineNumber = 0
+        with open("data/data.txt", 'r') as read_obj:
+            for line in read_obj:
+                lineNumber += 1
+                if string_to_search in line:
+                    value = line.rstrip()
+        read_obj.close()
+        return value.removeprefix(string_to_search + " = ")
+
+    #--[Search and Replace Value in data.txt]---------------------------------
+    def write_data(self, string_to_search, value):
+        lineNumber = 0
+        with open("data/data.txt", 'r') as read_obj:
+            filedata = read_obj.read()
+            filedata = filedata.replace(string_to_search + " = " + self.read_data(string_to_search), string_to_search + " = " + str(value))
+        with open("data/data.txt", 'w') as read_obj:
+            read_obj.write(filedata)
+        read_obj.close()
+
+    #-------------------------------------------------------------------------
+    # Program Functions
+    #-------------------------------------------------------------------------
+    #--[Toggle Fullscreen]----------------------------------------------------
+    def fullscreen(self, event):
+        if not self.attributes('-fullscreen'):
+            self.attributes('-fullscreen', True)
+        else:
+            self.attributes('-fullscreen', False)
+
+    def out_main_menu(self):
+        hideWidgetList = [self.play_button, self.sync_button, self.profile_button, self.about_button, self.exit_button, self.exit_confirm, self.exit_no_button, self.exit_yes_button]
+        for widget in hideWidgetList:
+            self.hide_widget(widget)
+        self.show_widget(self.back_button, 80, 20)
+        self.hide_canvas(self.BGFullCanvas)
+        self.show_canvas(self.BGCanvas)
+
+    #--[Moving to MainMenu Event]---------------------------------------------
+    def to_main_menu(self, event):
+        if self.read_data("isUserInGame") == "True":
+            self.stopwatch.stop()
+            hideWidgetList = [self.pre_countdown, self.rand_int_text, self.user_answer]
+            for widget in hideWidgetList:
+                self.hide_widget(widget)
+            showWidgetList = [[self.account_prompt, 500, 380], [self.cancel_game, 550, 480], [self.cancel_game_yes, 700, 683], [self.cancel_game_no, 1015, 683]]
+            for widget in range(len(showWidgetList)):
+                self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
+            self.write_data("isStopwatchPaused", "True")
+            self.user_answer.config(state = "disabled")
+            self.hide_widget(self.diag_box)
+        else:
+            hideWidgetList = [self.go_to_sync, self.sync_prompt, self.offline_button, self.back_button, self.account_prompt, self.account_text, self.offline_button, 
+                            self.create_button, self.login_button, self.logout_prompt, self.logout_button, self.cancel_logout_button, self.diag_box, self.profile_name, 
+                            self.profile_stat, self.profile_stat_game, self.male_profile_pic, self.female_profile_pic, self.change_gender_button, self.select_difficulty, 
+                            self.easy_difficulty_button, self.normal_difficulty_button, self.hard_difficulty_button, self.expert_difficulty_button]
+            for widget in hideWidgetList:
+                self.hide_widget(widget)
+            showWidgetList = [[self.play_button, 80, 425], [self.sync_button, 80, 558], [self.profile_button, 80, 690], [self.about_button, 80, 810], [self.exit_button, 80, 923]]
+            for widget in range(len(showWidgetList)):
+                self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
+            self.hide_canvas(self.BGCanvas)
+            self.hide_canvas(self.AboutCanvas)
+            self.show_canvas(self.BGFullCanvas)   
+
+    #--[BACK Button (in auth screen) Event]-----------------------------------
+    def back_auth(self, event):
+        hideWidgetList = [self.login_auth, self.back_auth_button, self.auth_message, self.username, self.password, self.create_acc, self.password_confirm]
+        for widget in hideWidgetList:
+            self.hide_widget(widget)
+        showWidgetList = [[self.create_button, 700, 683], [self.login_button, 1015, 683], [self.account_text, 520, 400], [self.back_button, 80, 20]]
+        for widget in range(len(showWidgetList)):
+            self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
+        self.username.delete(0, 'end')  # clear entered field
+        self.password.delete(0, 'end')
+        self.password_confirm.delete(0, 'end')
+        self.write_data("isUserInCredentialScreen", "False")
+    
+    #--[Check if User Logged in]----------------------------------------------
+    def play(self, event):
+        self.out_main_menu()
+        # If not login, player only have choice to play offline or go back to Sync menu
+        if self.read_data("isFirebaseConnected") == "False":
+            showWidgetList = [[self.account_prompt, 500, 380], [self.sync_prompt, 520, 400], [self.go_to_sync, 1015, 683], [self.offline_button, 700, 683]]
+            for widget in range(len(showWidgetList)):
+                self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
+        else:
+            self.difficulty_select(event)
+
+    #--[Play Offline]---------------------------------------------------------
+    def play_offline(self, event):
+        self.difficulty_select(event)
+
+    #--[Difficulty Selection Page]--------------------------------------------
+    def difficulty_select(self, event):
+        hideWidgetList = [self.account_prompt, self.sync_prompt, self.go_to_sync, self.offline_button]
+        for widget in hideWidgetList:
+            self.hide_widget(widget)
+        showWidgetList = [[self.diag_box, 227, 200], [self.select_difficulty, 289, 254], [self.easy_difficulty_button, 315, 418], 
+                        [self.normal_difficulty_button, 650, 418], [self.hard_difficulty_button, 986, 418], [self.expert_difficulty_button, 1322, 418]]
+        for widget in range(len(showWidgetList)):
+                self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
+
+    #--[SYNC Page]------------------------------------------------------------
+    def sync(self, event):
+        self.out_main_menu()
+        # Prompt user to choose whether they want to create an account, connect to existing account, or play offline
+        if self.read_data("isFirebaseConnected") == "False":
+            hideWidgetList = [self.go_to_sync, self.sync_prompt, self.offline_button]
+            for widget in hideWidgetList:
+                self.hide_widget(widget)
+            showWidgetList = [[self.account_prompt, 500, 380], [self.account_text, 520, 400], [self.create_button, 700, 683], [self.login_button, 1015, 683]]
+            for widget in range(len(showWidgetList)):
+                self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
+        else:
+            showWidgetList = [[self.account_prompt, 500, 380], [self.logout_prompt, 555, 500], [self.logout_button, 700, 683], [self.cancel_logout_button, 1015, 683]]
+            for widget in range(len(showWidgetList)):
+                self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
+
+    #--[PROFILE Page]---------------------------------------------------------
+    def profile(self, event):
+        if self.read_data("isFirebaseConnected") == "False":
+            showWidgetList = [[self.account_prompt, 500, 380], [self.no_sync, 650, 550], [self.ok_button, 860, 683]]
+            for widget in range(len(showWidgetList)):
+                self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
+        else:
+            self.out_main_menu()
+            showWidgetList = [[self.diag_box, 227, 200], [self.profile_name, 1000, 250], [self.profile_stat, 1000, 400], [self.profile_stat_game, 1245, 400], 
+                            [self.change_gender_button, 248, 840]]
+            for widget in range(len(showWidgetList)):
+                self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
+            self.profile_name.config(text = self.read_data("firebaseUsername"))
+            self.profile_stat_game.config(text = self.sum_times_played(self.read_data("firebaseUsername")) + "\n" + 
+                str(db.reference('Users/' + self.read_data("firebaseUsername") + '/TimesPlayed/Easy').get()) + " (Fastest : " + 
+                str(db.reference('Users/' + self.read_data("firebaseUsername") + '/FastestTime/Easy').get()) + ")" + "\n" +
+                
+                str(db.reference('Users/' + self.read_data("firebaseUsername") + '/TimesPlayed/Normal').get()) + " (Fastest : " + 
+                str(db.reference('Users/' + self.read_data("firebaseUsername") + '/FastestTime/Normal').get()) + ")" + "\n" +
+                
+                str(db.reference('Users/' + self.read_data("firebaseUsername") + '/TimesPlayed/Hard').get()) + " (Fastest : " + 
+                str(db.reference('Users/' + self.read_data("firebaseUsername") + '/FastestTime/Hard').get()) + ")" + "\n" +
+                
+                str(db.reference('Users/' + self.read_data("firebaseUsername") + '/TimesPlayed/Expert').get()) + " (Fastest : " + 
+                str(db.reference('Users/' + self.read_data("firebaseUsername") + '/FastestTime/Expert').get()) + ")" + "\n")
+            if str(db.reference('Users/' + self.read_data("firebaseUsername") + '/Gender').get()) == "0":
+                self.show_widget(self.male_profile_pic, 300, 300)
+            else:
+                self.show_widget(self.female_profile_pic, 300, 300)
+
+    #--[ABOUT Page]-----------------------------------------------------------
+    def about(self, event):
+        self.out_main_menu()
+        self.hide_canvas(self.BGCanvas)
+        self.show_canvas(self.AboutCanvas)
+        self.show_widget(self.back_button, 80, 20)
+        self.back_button.lift()
+
+    #--[Register Account Page]------------------------------------------------
+    def create_account(self, event):
+        if self.read_data("isUserInCredentialScreen") == "False":
+            hideWidgetList = [self.offline_button, self.login_button, self.account_text, self.back_button]
+            for widget in hideWidgetList:
+                self.hide_widget(widget)
+            showWidgetList = [[self.create_button, 1188, 683], [self.create_acc, 520, 470], [self.back_auth_button, 520, 400], [self.username, 900, 470], 
+                            [self.password, 900, 535], [self.password_confirm, 900, 602]]
+            for widget in range(len(showWidgetList)):
+                self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
+            self.write_data("isUserInCredentialScreen", "True")
+        else:
+            # Check login credential
+            self.show_widget(self.auth_message, 520, 683)
+            if self.username.get() == "" or self.password.get() == "" or self.password_confirm.get() == "":
+                self.auth_message.config(text = "Please complete all required fields.", fg = "red")
+            elif self.password.get() != self.password_confirm.get():
+                self.auth_message.config(text = "Passwords did not match. Try again.", fg = "red")
+            elif str(db.reference('Users/' + self.username.get()).get()) != "None":
+                self.auth_message.config(text = "This username is already taken.", fg = "red")
+            else:
+                self.create_new_user(self.username.get(), self.password.get())
+                self.hide_widget(self.create_button)
+                self.auth_message.config(text="Account created successfully. Please go back and click on Login.", fg = "green")
+
+    #--[Login Account Page]---------------------------------------------------
+    def login_account(self, event):
+        if self.read_data("isUserInCredentialScreen") == "False":
+            hideWidgetList = [self.offline_button, self.create_button, self.account_text, self.back_button]
+            for widget in hideWidgetList:
+                self.hide_widget(widget)
+            showWidgetList = [[self.login_button, 1188, 683], [self.login_auth, 590, 520], [self.back_auth_button, 520, 400], [self.username, 820, 520], [self.password, 820, 585]]
+            for widget in range(len(showWidgetList)):
+                self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
+            self.write_data("isUserInCredentialScreen", "True")
+        else:
+            # Check login credential
+            self.show_widget(self.auth_message, 520, 683)
+            user = db.reference('Users/' + self.username.get())
+            key = db.reference('Users/' + self.username.get() + '/Key')
+            if self.username.get() == "" or self.password.get() == "":
+                self.auth_message.config(text="Please complete all required fields.", fg = "red")
+            elif user.get() == "None" or key.get() != self.password.get():
+                self.auth_message.config(text="Username or password is incorrect. Try again.", fg = "red")
+            else:
+                hideWidgetList = [self.auth_message, self.login_button, self.login_auth, self.back_auth_button, self.username, self.password]
+                for widget in hideWidgetList:
+                    self.hide_widget(widget)
+                self.show_widget(self.ok_button, 860, 683)
+                self.show_widget(self.login_success, 800, 420)
+                self.write_data("isFirebaseConnected", "True")
+                self.write_data("firebaseUsername", self.username.get())
+                self.write_data("isUserInCredentialScreen", "False") 
+                self.login_success.config(text = "Login successful! \n\n  Username : " + self.username.get() + "\nHave a nice day!", fg = "green")
+                self.username.delete(0, 'end')
+                self.password.delete(0, 'end')
+
+    #--[Login Affirm]---------------------------------------------------------
+    def login_affirm(self, event):
+        hideWidgetList = [self.ok_button, self.no_sync, self.account_prompt, self.login_success]
+        for widget in hideWidgetList:
+            self.hide_widget(widget)
+        self.to_main_menu(event)
+
+    #--[Logout]---------------------------------------------------------------
+    def logout(self, event):
+        self.write_data("isUserInCredentialScreen", "False")
+        self.write_data("firebaseUsername", "null")
+        self.write_data("isFirebaseConnected", "False")
+        self.to_main_menu(event)
+
+    #--[Change Gender]--------------------------------------------------------
+    def change_gender(self, event):
+        if str(db.reference('Users/' + self.read_data("firebaseUsername") + '/Gender').get()) == "0":
+            self.show_widget(self.female_profile_pic, 300, 300)
+            self.hide_widget(self.male_profile_pic)
+            self.write_to_firebase(self.read_data("firebaseUsername"), "Gender", 1)
+        else:
+            self.show_widget(self.male_profile_pic, 300, 300)
+            self.hide_widget(self.female_profile_pic)
+            self.write_to_firebase(self.read_data("firebaseUsername"), "Gender", 0)
+
+    #--[Prompt Exit Confirmation While Game is Ongoing]-----------------------
+    def prompt_exit(self, event):
+        hideWidgetList = [self.diag_box, self.pre_countdown, self.user_answer, self.rand_int_text, self.account_prompt, self.cancel_game, self.cancel_game_yes, self.cancel_game_no]
+        for widget in hideWidgetList:
+            self.hide_widget(widget)
+        self.write_data("isUserInGame", "False")
+        self.write_data("isStopwatchPaused", "False")
+        self.write_data("isGameStarted", "False")
+        winsound.PlaySound('data/sounds/BGMusic.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
+        self.to_main_menu(event)
+
+    #--[Cancel Exit Confirmation While Game is Ongoing]-----------------------
+    def prompt_exit_cancel(self, event):
+        hideWidgetList = [self.account_prompt, self.cancel_game, self.cancel_game_yes, self.cancel_game_no]
+        for widget in hideWidgetList:
+            self.hide_widget(widget)
+        self.show_widget(self.rand_int_text, 400, 350)
+        self.show_widget(self.diag_box, 227, 200)
+        if self.read_data("isGameStarted") == "True":
+            self.show_widget(self.user_answer, 670, 750)
+            self.show_widget(self.pre_countdown, 900, 215)
+            self.user_answer.config(state = 'normal')
+        else:
+            self.show_widget(self.pre_countdown, 580, 520)
+        self.write_data("isStopwatchPaused", "False") 
+        self.stopwatch.start()
+
+    #--[Easy Gamemode]--------------------------------------------------------
+    def easy_gamemode(self, event):
+        self.write_data("selectedDifficulty", "Easy")
+        self.write_data("questionSize", 19)
+        self.write_data("minInteger", 0)
+        self.write_data("maxInteger", 9)
+        self.start_game()
+
+    #--[Normal Gamemode]------------------------------------------------------
+    def normal_gamemode(self, event):
+        self.write_data("selectedDifficulty", "Normal")
+        self.write_data("questionSize", 19)
+        self.write_data("minInteger", 10)
+        self.write_data("maxInteger", 99)
+        self.start_game()
+
+    #--[Hard Gamemode]--------------------------------------------------------
+    def hard_gamemode(self, event):
+        self.write_data("selectedDifficulty", "Hard")
+        self.write_data("questionSize", 19)
+        self.write_data("minInteger", 100)
+        self.write_data("maxInteger", 999)
+        self.start_game()
+
+    #--[Expert Gamemode]------------------------------------------------------
+    def expert_gamemode(self, event):
+        self.write_data("selectedDifficulty", "Expert")
+        self.write_data("questionSize", 19)
+        self.write_data("minInteger", 1000)
+        self.write_data("maxInteger", 9999)
+        self.start_game()
+
+    #--[Countdown Timer]------------------------------------------------------
+    def countdown_timer(self, t):
+        winsound.PlaySound(None, winsound.SND_PURGE)
+        self.show_widget(self.pre_countdown, 580, 520)
+        while t >= 0:
+            if self.read_data("isStopwatchPaused") == "False":
+                self.after(1000)
+                self.pre_countdown.config(text = "Game will start in " + str(t) + " seconds!\nPress 'ENTER' to submit answer", fg = "black")
+                t -= 1
+            self.update()  # Prevent Tkinter from locking up
+        if self.read_data("isStopwatchPaused") == "False":
+            Stopwatch.restart(self)
+            self.user_answer.config(state = 'normal')
+            self.show_widget(self.back_button, 80, 20)
+            self.write_data("isGameStarted", "True")
+            winsound.PlaySound('data/sounds/GameStart.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
+
+    #--[Game Start]-----------------------------------------------------------
+    def start_game(self):
+        hideWidgetList = [self.select_difficulty, self.easy_difficulty_button, self.normal_difficulty_button, self.hard_difficulty_button, 
+                        self.expert_difficulty_button, self.back_button]
+        for widget in hideWidgetList:
+            self.hide_widget(widget)
+        self.write_data("isUserInGame", "True")
+        self.write_data("currentQuestionNumber", 0)
+        self.countdown_timer(5)
+        self.summon_question()
+
+    #--[Summon Question]------------------------------------------------------
+    def summon_question(self):
+        if int(self.read_data("currentQuestionNumber")) <= int(self.read_data("questionSize")):
+            showWidgetList = [[self.user_answer, 670, 750], [self.rand_int_text, 400, 350], [self.pre_countdown, 900, 215]]
+            for widget in range(len(showWidgetList)):
+                self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
+            self.user_answer.focus()
+            int1 = random.randint(int(self.read_data("minInteger")), int(self.read_data("maxInteger")))
+            int2 = random.randint(int(self.read_data("minInteger")), int(self.read_data("maxInteger")))
+            self.rand_int_text.config(text = str(int1) + " + " + str(int2))
+            self.write_data("answer", int1 + int2)
+            self.pre_countdown.config(text = str(int(self.read_data("currentQuestionNumber")) + 1) + "/" + str(int(self.read_data("questionSize")) + 1), anchor = "e")
+        else:  # Game finishes
+            hideWidgetList = [self.back_button, self.rand_int_text, self.user_answer]
+            for widget in hideWidgetList:
+                self.hide_widget(widget)
+            self.show_widget(self.finish_game, 840, 770)
+            self.show_widget(self.pre_countdown, 420, 450)
+            self.stopwatch.stop()
+            winsound.PlaySound('data/sounds/GameFinish.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
+            self.write_data("currentQuestionNumber", 0)
+            self.write_data("isUserInGame", "False")
+            self.write_data("isGameStarted", "False")
+            self.pre_countdown.config(text = "Your time is " + str(self.stopwatch) + "\nKeep on trying!")
+            self.user_answer.delete(0, 'end')
+            self.submit_score()
+
+    #--[Check Answer]---------------------------------------------------------
+    def check_answer(self, event):
+        if self.user_answer.get() == self.read_data("answer"):
+            self.write_data("currentQuestionNumber", int(self.read_data("currentQuestionNumber")) + 1)
+            self.user_answer.delete(0, 'end')
+            self.summon_question()
+
+    #--[Submit Score to Firebase Database]------------------------------------
+    def submit_score(self):
+        if self.read_data("isFirebaseConnected") == "True":
+            times_played = db.reference('Users/' + self.read_data("firebaseUsername") + '/TimesPlayed/' + self.read_data("selectedDifficulty"))
+            played = times_played.get()
+            played += 1
+            user = db.reference('Users')
+            user.update({self.read_data("firebaseUsername") + '/TimesPlayed/' + self.read_data("selectedDifficulty"): played,})
+            best_time_prev = db.reference('Users/' + self.read_data("firebaseUsername") + '/FastestTime/' + self.read_data("selectedDifficulty") + 'Value')
+            if self.stopwatch.duration < best_time_prev.get():
+                self.pre_countdown.config(text = "Congratulations!" + "\n" + "Your time is " + str(self.stopwatch) + "\nNew Record!", fg = "green")
+                user.update({
+                    self.read_data("firebaseUsername") + '/FastestTime/' + self.read_data("selectedDifficulty"): str(self.stopwatch),
+                    self.read_data("firebaseUsername") + '/FastestTime/' + self.read_data("selectedDifficulty") + 'Value': self.stopwatch.duration
+                })
+
+    #--[Result Affirm]--------------------------------------------------------
+    def ok_result(self, event):
+        hideWidgetList = [self.diag_box, self.pre_countdown, self.finish_game]
+        for widget in hideWidgetList:
+            self.hide_widget(widget)
+        winsound.PlaySound('data/sounds/BGMusic.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
+        self.to_main_menu(event)
+
+    #--[EXIT PROGRAM Confirmation Dialog]-------------------------------------
+    def close_confirmation(self, event):
+        showWidgetList = [[self.exit_confirm, 525, 450], [self.exit_yes_button, 720, 570], [self.exit_no_button, 1000, 570]]
+        for widget in range(len(showWidgetList)):
+            self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
+        self.exit_confirm.lift()
+        self.exit_yes_button.lift()
+        self.exit_no_button.lift()
+
+    #--[Cancel Exit Program Event]--------------------------------------------
+    def cancel(self, event):
+        self.hide_widget(self.exit_confirm)
+        self.hide_widget(self.exit_yes_button)
+        self.hide_widget(self.exit_no_button)
+
+    #--[Exit Program Event]---------------------------------------------------
+    def close(self, event):
+        self.destroy()
+    
 #--[Initialize Stopwatch]-------------------------------------------------
 class Stopwatch:
     def __init__(self):
         self._start = time.perf_counter()
         self._end = None
+
+    @property
+    def duration(self):
+        return self._end - self._start if self._end else time.perf_counter() - self._start
 
     @property
     def running(self):
@@ -56,775 +830,7 @@ class Stopwatch:
         if time >= 1:
             return "{:.2f}ms".format(time)
         return "{:.2f}μs".format(time * 1000)
-
-stopwatch = Stopwatch()
-
-#-------------------------------------------------------------------------
-# Database
-#-------------------------------------------------------------------------
-#--[Authenticate Firebase Database]---------------------------------------
-cred = credentials.Certificate('data/acemath-n0miya-firebase-adminsdk-yft0t-e8061fb0b1.json')
-initialize_app(cred, {'databaseURL': 'https://acemath-n0miya-default-rtdb.asia-southeast1.firebasedatabase.app/'})
-
-#--[Create New User in Firebase Database]---------------------------------
-def create_new_user(user_name, user_password):
-    user = db.reference('Users')
-    user.child(user_name).set({
-        'Key': user_password,
-        'Gender': 0,
-        'TimesPlayed': {
-            'Easy': 0,
-            'Normal': 0,
-            'Hard': 0,
-            'Expert': 0,
-        },
-        'FastestTime': {
-            'Easy': "00.00s",
-            'Normal': "00.00s",
-            'Hard': "00.00s",
-            'Expert': "00.00s",
-            'EasyValue': 999999999,
-            'NormalValue': 999999999,
-            'HardValue': 999999999,
-            'ExpertValue': 999999999,
-        }
-    })
-
-
-#--[Write Data to Firebase Database]--------------------------------------
-def write_to_firebase(user_name, child, data):
-    user = db.reference('Users')
-    user.child(user_name).update({
-        child: data,
-    })
-
-#--[Get Amount of Times User Has Played]----------------------------------
-def sum_times_played(user_name):
-    easy = db.reference('Users/' + str(user_name) + '/TimesPlayed/Easy').get()
-    normal = db.reference('Users/' + str(user_name) + '/TimesPlayed/Normal').get()
-    hard = db.reference('Users/' + str(user_name) + '/TimesPlayed/Hard').get()
-    expert = db.reference('Users/' + str(user_name) + '/TimesPlayed/Expert').get()
-    sum_played = easy + normal + hard + expert
-    return str(sum_played)
-
-#-------------------------------------------------------------------------
-# Accessing data.txt
-#-------------------------------------------------------------------------
-#--[Search and Get Value in data.txt]-------------------------------------
-def read_data(string_to_search):
-    lineNumber = 0
-    with open("data/data.txt", 'r') as read_obj:
-        for line in read_obj:
-            lineNumber += 1
-            if string_to_search in line:
-                value = line.rstrip()
-    read_obj.close()
-    return value.removeprefix(string_to_search + " = ")
-
-#--[Search and Replace Value in data.txt]---------------------------------
-def write_data(string_to_search, value):
-    lineNumber = 0
-    with open("data/data.txt", 'r') as read_obj:
-        filedata = read_obj.read()
-        filedata = filedata.replace(string_to_search + " = " + read_data(string_to_search), string_to_search + " = " + str(value))
-    with open("data/data.txt", 'w') as read_obj:
-        read_obj.write(filedata)
-    read_obj.close()
-
-#-------------------------------------------------------------------------
-# Canvas and Widget Management
-#-------------------------------------------------------------------------
-#--[Hide Canvas]----------------------------------------------------------
-def hide_canvas(canvas):
-    canvas.pack_forget()
-
-#--[SHow Canvas]----------------------------------------------------------
-def show_canvas(canvas):
-    canvas.pack()
-
-#--[Hide Widget]----------------------------------------------------------
-def hide_widget(widget):
-    widget.place_forget()
-
-#--[Show Widget]----------------------------------------------------------
-def show_widget(widget, x_coordinate, y_coordinate):
-    widget.place(x = x_coordinate, y = y_coordinate)
-
-#-------------------------------------------------------------------------
-# Program Functions
-#-------------------------------------------------------------------------
-#--[Toggle Fullscreen]----------------------------------------------------
-def fullscreen(event):
-    if not MainWindow.attributes('-fullscreen'):
-        MainWindow.attributes('-fullscreen', True)
-    else:
-        MainWindow.attributes('-fullscreen', False)
-
-#--[Moving Out of MainMenu Event]-----------------------------------------
-def out_main_menu():
-    hideWidgetList = [play_button, sync_button, profile_button, about_button, exit_button, exit_confirm, exit_no_button, exit_yes_button]
-    for widget in hideWidgetList:
-        hide_widget(widget)
-    show_widget(back_button, 80, 20)
-    hide_canvas(BGFullCanvas)
-    show_canvas(BGCanvas)
-
-#--[Moving to MainMenu Event]---------------------------------------------
-def to_main_menu(event):
-    if read_data("isUserInGame") == "True":
-        stopwatch.stop()
-        hideWidgetList = [pre_countdown, rand_int_text, user_answer]
-        for widget in hideWidgetList:
-            hide_widget(widget)
-        showWidgetList = [[account_prompt, 500, 380], [cancel_game, 550, 480], [cancel_game_yes, 700, 683], [cancel_game_no, 1015, 683]]
-        for widget in range(len(showWidgetList)):
-            show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
-        write_data("isStopwatchPaused", "True")
-        user_answer.config(state = "disabled")
-        hide_widget(diag_box)
-    else:
-        hideWidgetList = [go_to_sync, sync_prompt, offline_button, back_button, account_prompt, account_text, offline_button, create_button,
-                        login_button, logout_prompt, logout_button, cancel_logout_button, diag_box, profile_name, profile_stat, profile_stat_game,
-                        male_profile_pic, female_profile_pic, change_gender_button, select_difficulty, easy_difficulty_button, normal_difficulty_button,
-                        hard_difficulty_button, expert_difficulty_button]
-        for widget in hideWidgetList:
-            hide_widget(widget)
-        showWidgetList = [[play_button, 80, 425], [sync_button, 80, 558], [profile_button, 80, 690], [about_button, 80, 810], [exit_button, 80, 923]]
-        for widget in range(len(showWidgetList)):
-            show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
-        hide_canvas(BGCanvas)
-        hide_canvas(AboutCanvas)
-        show_canvas(BGFullCanvas)   
-
-#--[BACK Button (in auth screen) Event]-----------------------------------
-def back_auth(event):
-    hideWidgetList = [login_auth, back_auth_button, auth_message, username, password, create_acc, password_confirm]
-    for widget in hideWidgetList:
-        hide_widget(widget)
-    showWidgetList = [[create_button, 700, 683], [login_button, 1015, 683], [account_text, 520, 400], [back_button, 80, 20]]
-    for widget in range(len(showWidgetList)):
-        show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
-    username.delete(0, 'end')  # clear entered field
-    password.delete(0, 'end')
-    password_confirm.delete(0, 'end')
-    write_data("isUserInCredentialScreen", "False")
-
-#--[Check if User Logged in]----------------------------------------------
-def play(event):
-    out_main_menu()
-    # If not login, player only have choice to play offline or go back to Sync menu
-    if read_data("isFirebaseConnected") == "False":
-        showWidgetList = [[account_prompt, 500, 380], [sync_prompt, 520, 400], [go_to_sync, 1015, 683], [offline_button, 700, 683]]
-        for widget in range(len(showWidgetList)):
-            show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
-    else:
-        difficulty_select(event)
-
-#--[Play Offline]---------------------------------------------------------
-def play_offline(event):
-    difficulty_select(event)
-
-#--[Difficulty Selection Page]--------------------------------------------
-def difficulty_select(event):
-    hideWidgetList = [account_prompt, sync_prompt, go_to_sync, offline_button]
-    for widget in hideWidgetList:
-        hide_widget(widget)
-    showWidgetList = [[diag_box, 227, 200], [select_difficulty, 289, 254], [easy_difficulty_button, 315, 418], 
-                    [normal_difficulty_button, 650, 418], [hard_difficulty_button, 986, 418], [expert_difficulty_button, 1322, 418]]
-    for widget in range(len(showWidgetList)):
-            show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
-
-#--[SYNC Page]------------------------------------------------------------
-def sync(event):
-    out_main_menu()
-    # Prompt user to choose whether they want to create an account, connect to existing account, or play offline
-    if read_data("isFirebaseConnected") == "False":
-        hideWidgetList = [go_to_sync, sync_prompt, offline_button]
-        for widget in hideWidgetList:
-            hide_widget(widget)
-        showWidgetList = [[account_prompt, 500, 380], [account_text, 520, 400], [create_button, 700, 683], [login_button, 1015, 683]]
-        for widget in range(len(showWidgetList)):
-            show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
-    else:
-        showWidgetList = [[account_prompt, 500, 380], [logout_prompt, 555, 500], [logout_button, 700, 683], [cancel_logout_button, 1015, 683]]
-        for widget in range(len(showWidgetList)):
-            show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
-
-#--[PROFILE Page]---------------------------------------------------------
-def profile(event):
-    if read_data("isFirebaseConnected") == "False":
-        showWidgetList = [[account_prompt, 500, 380], [no_sync, 650, 550], [ok_button, 860, 683]]
-        for widget in range(len(showWidgetList)):
-            show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
-    else:
-        out_main_menu()
-        showWidgetList = [[diag_box, 227, 200], [profile_name, 1000, 250], [profile_stat, 1000, 400], [profile_stat_game, 1245, 400], 
-                        [change_gender_button, 248, 840]]
-        for widget in range(len(showWidgetList)):
-            show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
-        profile_name.config(text=read_data("firebaseUsername"))
-        profile_stat_game.config(text=sum_times_played(read_data("firebaseUsername")) + "\n" + 
-            str(db.reference('Users/' + read_data("firebaseUsername") + '/TimesPlayed/Easy').get()) + " (Fastest : " + 
-            str(db.reference('Users/' + read_data("firebaseUsername") + '/FastestTime/Easy').get()) + ")" + "\n" +
-            
-            str(db.reference('Users/' + read_data("firebaseUsername") + '/TimesPlayed/Normal').get()) + " (Fastest : " + 
-            str(db.reference('Users/' + read_data("firebaseUsername") + '/FastestTime/Normal').get()) + ")" + "\n" +
-            
-            str(db.reference('Users/' + read_data("firebaseUsername") + '/TimesPlayed/Hard').get()) + " (Fastest : " + 
-            str(db.reference('Users/' + read_data("firebaseUsername") + '/FastestTime/Hard').get()) + ")" + "\n" +
-            
-            str(db.reference('Users/' + read_data("firebaseUsername") + '/TimesPlayed/Expert').get()) + " (Fastest : " + 
-            str(db.reference('Users/' + read_data("firebaseUsername") + '/FastestTime/Expert').get()) + ")" + "\n")
-        if str(db.reference('Users/' + read_data("firebaseUsername") + '/Gender').get()) == "0":
-            show_widget(male_profile_pic, 300, 300)
-        else:
-            show_widget(female_profile_pic, 300, 300)
-
-#--[ABOUT Page]-----------------------------------------------------------
-def about(event):
-    out_main_menu()
-    hide_canvas(BGCanvas)
-    show_canvas(AboutCanvas)
-    show_widget(back_button, 80, 20)
-    back_button.lift()
-
-#--[Register Account Page]------------------------------------------------
-def create_account(event):
-    if read_data("isUserInCredentialScreen") == "False":
-        hideWidgetList = [offline_button, login_button, account_text, back_button]
-        for widget in hideWidgetList:
-            hide_widget(widget)
-        showWidgetList = [[create_button, 1188, 683], [create_acc, 520, 470], [back_auth_button, 520, 400], [username, 900, 470], 
-                        [password, 900, 535], [password_confirm, 900, 602]]
-        for widget in range(len(showWidgetList)):
-            show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
-        write_data("isUserInCredentialScreen", "True")
-    else:
-        # Check login credential
-        show_widget(auth_message, 520, 683)
-        if username.get() == "" or password.get() == "" or password_confirm.get() == "":
-            auth_message.config(text = "Please complete all required fields.", fg = "red")
-        elif password.get() != password_confirm.get():
-            auth_message.config(text = "Passwords did not match. Try again.", fg = "red")
-        elif str(db.reference('Users/' + username.get()).get()) != "None":
-            auth_message.config(text = "This username is already taken.", fg = "red")
-        else:
-            create_new_user(username.get(), password.get())
-            hide_widget(create_button)
-            auth_message.config(text="Account created successfully. Please go back and click on Login.", fg = "green")
-
-#--[Login Account Page]---------------------------------------------------
-def login_account(event):
-    if read_data("isUserInCredentialScreen") == "False":
-        hideWidgetList = [offline_button, create_button, account_text, back_button]
-        for widget in hideWidgetList:
-            hide_widget(widget)
-        showWidgetList = [[login_button, 1188, 683], [login_auth, 590, 520], [back_auth_button, 520, 400], [username, 820, 520], [password, 820, 585]]
-        for widget in range(len(showWidgetList)):
-            show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
-        write_data("isUserInCredentialScreen", "True")
-    else:
-        # Check login credential
-        show_widget(auth_message, 520, 683)
-        user = db.reference('Users/' + username.get())
-        key = db.reference('Users/' + username.get() + '/Key')
-        if username.get() == "" or password.get() == "":
-            auth_message.config(text="Please complete all required fields.", fg = "red")
-        elif user.get() == "None" or key.get() != password.get():
-            auth_message.config(text="Username or password is incorrect. Try again.", fg = "red")
-        else:
-            hideWidgetList = [auth_message, login_button, login_auth, back_auth_button, username, password]
-            for widget in hideWidgetList:
-                hide_widget(widget)
-            show_widget(ok_button, 860, 683)
-            show_widget(login_success, 800, 420)
-            write_data("isFirebaseConnected", "True")
-            write_data("firebaseUsername", username.get())
-            write_data("isUserInCredentialScreen", "False") 
-            login_success.config(text = "Login successful! \n\n  Username : " + username.get() + "\nHave a nice day!", fg = "green")
-            username.delete(0, 'end')
-            password.delete(0, 'end')
-
-#--[Login Affirm]---------------------------------------------------------
-def login_affirm(event):
-    hideWidgetList = [ok_button, no_sync, account_prompt, login_success]
-    for widget in hideWidgetList:
-        hide_widget(widget)
-    to_main_menu(event)
-
-#--[Logout]---------------------------------------------------------------
-def logout(event):
-    write_data("isUserInCredentialScreen", "False")
-    write_data("firebaseUsername", "null")
-    write_data("isFirebaseConnected", "False")
-    to_main_menu(event)
-
-#--[Change Gender]--------------------------------------------------------
-def change_gender(event):
-    if str(db.reference('Users/' + read_data("firebaseUsername") + '/Gender').get()) == "0":
-        show_widget(female_profile_pic, 300, 300)
-        hide_widget(male_profile_pic)
-        write_to_firebase(read_data("firebaseUsername"), "Gender", 1)
-    else:
-        show_widget(male_profile_pic, 300, 300)
-        hide_widget(female_profile_pic)
-        write_to_firebase(read_data("firebaseUsername"), "Gender", 0)
-
-#--[Prompt Exit Confirmation While Game is Ongoing]-----------------------
-def prompt_exit(event):
-    hideWidgetList = [diag_box, pre_countdown, user_answer, rand_int_text, account_prompt, cancel_game, cancel_game_yes, cancel_game_no]
-    for widget in hideWidgetList:
-        hide_widget(widget)
-    write_data("isUserInGame", "False")
-    write_data("isStopwatchPaused", "False")
-    write_data("isGameStarted", "False")
-    winsound.PlaySound('data/sounds/BGMusic.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
-    to_main_menu(event)
-
-#--[Cancel Exit Confirmation While Game is Ongoing]-----------------------
-def prompt_exit_cancel(event):
-    hideWidgetList = [account_prompt, cancel_game, cancel_game_yes, cancel_game_no]
-    for widget in hideWidgetList:
-        hide_widget(widget)
-    show_widget(rand_int_text, 400, 350)
-    show_widget(diag_box, 227, 200)
-    if read_data("isGameStarted") == "True":
-        show_widget(user_answer, 670, 750)
-        show_widget(pre_countdown, 900, 215)
-        user_answer.config(state = 'normal')
-    else:
-        show_widget(pre_countdown, 580, 520)
-    write_data("isStopwatchPaused", "False") 
-    stopwatch.start()
-
-#--[Easy Gamemode]--------------------------------------------------------
-def easy_gamemode(event):
-    write_data("selectedDifficulty", "Easy")
-    write_data("questionSize", 19)
-    write_data("minInteger", 0)
-    write_data("maxInteger", 9)
-    start_game()
-
-#--[Normal Gamemode]------------------------------------------------------
-def normal_gamemode(event):
-    write_data("selectedDifficulty", "Normal")
-    write_data("questionSize", 19)
-    write_data("minInteger", 10)
-    write_data("maxInteger", 99)
-    start_game()
-
-#--[Hard Gamemode]--------------------------------------------------------
-def hard_gamemode(event):
-    write_data("selectedDifficulty", "Hard")
-    write_data("questionSize", 19)
-    write_data("minInteger", 100)
-    write_data("maxInteger", 999)
-    start_game()
-
-#--[Expert Gamemode]------------------------------------------------------
-def expert_gamemode(event):
-    write_data("selectedDifficulty", "Expert")
-    write_data("questionSize", 19)
-    write_data("minInteger", 1000)
-    write_data("maxInteger", 9999)
-    start_game()
-
-#--[Countdown Timer]------------------------------------------------------
-def countdown_timer(t):
-    winsound.PlaySound(None, winsound.SND_PURGE)
-    show_widget(pre_countdown, 580, 520)
-    while t >= 0:
-        if read_data("isStopwatchPaused") == "False":
-            MainWindow.after(1000)
-            pre_countdown.config(text = "Game will start in " + str(t) + " seconds!\nPress 'ENTER' to submit answer", fg = "black")
-            t -= 1
-        MainWindow.update()  # Prevent Tkinter from locking up
-    if read_data("isStopwatchPaused") == "False":
-        stopwatch.restart()
-        user_answer.config(state = 'normal')
-        show_widget(back_button, 80, 20)
-        write_data("isGameStarted", "True")
-        winsound.PlaySound('data/sounds/GameStart.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
-
-#--[Game Start]-----------------------------------------------------------
-def start_game():
-    hideWidgetList = [select_difficulty, easy_difficulty_button, normal_difficulty_button, hard_difficulty_button, expert_difficulty_button, back_button]
-    for widget in hideWidgetList:
-        hide_widget(widget)
-    write_data("isUserInGame", "True")
-    write_data("currentQuestionNumber", 0)
-    countdown_timer(5)
-    summon_question()
-
-#--[Summon Question]------------------------------------------------------
-def summon_question():
-    if int(read_data("currentQuestionNumber")) <= int(read_data("questionSize")):
-        showWidgetList = [[user_answer, 670, 750], [rand_int_text, 400, 350], [pre_countdown, 900, 215]]
-        for widget in range(len(showWidgetList)):
-            show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
-        user_answer.focus()
-        int1 = random.randint(int(read_data("minInteger")), int(read_data("maxInteger")))
-        int2 = random.randint(int(read_data("minInteger")), int(read_data("maxInteger")))
-        rand_int_text.config(text = str(int1) + " + " + str(int2))
-        write_data("answer", int1 + int2)
-        pre_countdown.config(text = str(int(read_data("currentQuestionNumber")) + 1) + "/" + str(int(read_data("questionSize")) + 1), anchor = "e")
-    else:  # Game finishes
-        hideWidgetList = [back_button, rand_int_text, user_answer]
-        for widget in hideWidgetList:
-            hide_widget(widget)
-        show_widget(finish_game, 840, 770)
-        show_widget(pre_countdown, 420, 450)
-        stopwatch.stop()
-        winsound.PlaySound('data/sounds/GameFinish.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
-        write_data("currentQuestionNumber", 0)
-        write_data("isUserInGame", "False")
-        write_data("isGameStarted", "False")
-        pre_countdown.config(text = "Your time is " + str(stopwatch) + "\nKeep on trying!")
-        user_answer.delete(0, 'end')
-        submit_score()
-
-#--[Check Answer]---------------------------------------------------------
-def check_answer(event):
-    if user_answer.get() == read_data("answer"):
-        write_data("currentQuestionNumber", int(read_data("currentQuestionNumber")) + 1)
-        user_answer.delete(0, 'end')
-        summon_question()
-
-#--[Submit Score to Firebase Database]------------------------------------
-def submit_score():
-    if read_data("isFirebaseConnected") == "True":
-        times_played = db.reference('Users/' + read_data("firebaseUsername") + '/TimesPlayed/' + read_data("selectedDifficulty"))
-        played = times_played.get()
-        played += 1
-        user = db.reference('Users')
-        user.update({read_data("firebaseUsername") + '/TimesPlayed/' + read_data("selectedDifficulty"): played,})
-        best_time_prev = db.reference('Users/' + read_data("firebaseUsername") + '/FastestTime/' + read_data("selectedDifficulty") + 'Value')
-        if stopwatch.duration < best_time_prev.get():
-            pre_countdown.config(text = "Congratulations!" + "\n" + "Your time is " + str(stopwatch) + "\nNew Record!", fg = "green")
-            user.update({
-                read_data("firebaseUsername") + '/FastestTime/' + read_data("selectedDifficulty"): str(stopwatch),
-                read_data("firebaseUsername") + '/FastestTime/' + read_data("selectedDifficulty") + 'Value': stopwatch.duration
-            })
-
-#--[Result Affirm]--------------------------------------------------------
-def ok_result(event):
-    hideWidgetList = [diag_box, pre_countdown, finish_game]
-    for widget in hideWidgetList:
-        hide_widget(widget)
-    winsound.PlaySound('data/sounds/BGMusic.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
-    to_main_menu(event)
-
-#--[EXIT PROGRAM Confirmation Dialog]-------------------------------------
-def close_confirmation(event):
-    showWidgetList = [[exit_confirm, 525, 450], [exit_yes_button, 720, 570], [exit_no_button, 1000, 570]]
-    for widget in range(len(showWidgetList)):
-        show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
-    exit_confirm.lift()
-    exit_yes_button.lift()
-    exit_no_button.lift()
-
-#--[Cancel Exit Program Event]--------------------------------------------
-def cancel(event):
-    hide_widget(exit_confirm)
-    hide_widget(exit_yes_button)
-    hide_widget(exit_no_button)
-
-#--[Exit Program Event]---------------------------------------------------
-def close(event):
-    MainWindow.destroy()
-
-#-------------------------------------------------------------------------
-# Program Initialization
-#-------------------------------------------------------------------------
-MainWindow = Tk()
-MainWindow.title('AcΣMαth')
-MainWindow.geometry("1920x1080")
-MainWindow.attributes('-fullscreen', True)
-MainWindow.wm_iconbitmap('data/images/AceMath.ico')
-MainWindow.bind('<F11>', fullscreen)
-MainWindow.bind('<Escape>', close_confirmation)
-winsound.PlaySound('data/sounds/BGMusic.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
-write_data("isUserInCredentialScreen", "False")
-write_data("isGameStarted", "False")
-write_data("isStopwatchPaused", "False")
-write_data("isUserInGame", "False")
-write_data("currentQuestionNumber", 0)
-
-#-------------------------------------------------------------------------
-# Assets Initialization
-#-------------------------------------------------------------------------
-#--[Background Image]-----------------------------------------------------
-BGFullCanvas = Canvas(MainWindow, width = 1920, height = 1080)
-BGFullCanvas.pack()
-BGFull = ImageTk.PhotoImage(Image.open("data/images/BGFull.jpg"))
-BGFullCanvas.create_image(0, 0, anchor = "nw", image = BGFull)
-
-BGCanvas = Canvas(MainWindow, width = 1920, height = 1080)
-BGCanvas.pack()
-BG = ImageTk.PhotoImage(Image.open("data/images/BG.jpg"))
-BGCanvas.create_image(0, 0, anchor = "nw", image = BG)
-
-#--[Play Button]----------------------------------------------------------
-PlayButtonBG = PhotoImage(file = "data/images/Play.png")
-play_button = Button(MainWindow, width = 274, height = 109, image = PlayButtonBG, borderwidth = 0)
-play_button.place(x = 80, y = 425)
-play_button.bind('<Button-1>', play)
-
-#--[Sync Button]----------------------------------------------------------
-SyncButtonBG = PhotoImage(file = "data/images/Sync.png")
-sync_button = Button(MainWindow, width = 276, height = 107, image = SyncButtonBG, borderwidth = 0)
-sync_button.place(x = 80, y = 558)
-sync_button.bind('<Button-1>', sync)
-
-#--[Profile Button]-------------------------------------------------------
-ProfileButtonBG = PhotoImage(file = "data/images/Profile.png")
-profile_button = Button(MainWindow, width = 363, height = 94, image = ProfileButtonBG, borderwidth = 0)
-profile_button.place(x = 80, y = 690)
-profile_button.bind('<Button-1>', profile)
-
-#--[About Button]---------------------------------------------------------
-AboutButtonBG = PhotoImage(file = "data/images/About.png")
-about_button = Button(MainWindow, width = 335, height = 90, image = AboutButtonBG, borderwidth = 0)
-about_button.place(x = 80, y = 810)
-about_button.bind('<Button-1>', about)
-
-#--[Exit Button]----------------------------------------------------------
-ExitButtonBG = PhotoImage(file = "data/images/Exit.png")
-exit_button = Button(MainWindow, width = 252, height = 87, image = ExitButtonBG, borderwidth = 0)
-exit_button.place(x = 80, y = 923)
-exit_button.bind('<Button-1>', close_confirmation)
-
-#--[Back Button]----------------------------------------------------------
-BackButtonBG = PhotoImage(file="data/images/Back.png")
-back_button = Button(MainWindow, width = 314, height = 95, image = BackButtonBG, borderwidth = 0)
-back_button.bind('<Button-1>', to_main_menu)
-hide_widget(back_button)
-
-#--[About Description]----------------------------------------------------
-AboutCanvas = Canvas(MainWindow, width = 1920, height = 1080)
-AboutCanvas.pack()
-About = ImageTk.PhotoImage(Image.open("data/images/AboutMe.jpg"))
-AboutCanvas.create_image(0, 0, anchor = "nw", image = About)
-hide_canvas(AboutCanvas)
-
-#--[Exit Confirmation Dialog]---------------------------------------------
-ExitConfirmDiagBG = Image.open("data/images/ExitDiag.png")
-ExitConfirmBG = ImageTk.PhotoImage(ExitConfirmDiagBG)
-exit_confirm = tkinter.Label(image = ExitConfirmBG)
-hide_widget(exit_confirm)
-
-ExitYesButtonBG = PhotoImage(file = "data/images/Yes.png")
-exit_yes_button = Button(MainWindow, width = 241, height = 61, image = ExitYesButtonBG, borderwidth = 0)
-exit_yes_button.bind('<Button-1>', close)
-hide_widget(exit_yes_button)
-
-ExitNoButtonBG = PhotoImage(file = "data/images/No.png")
-exit_no_button = Button(MainWindow, width = 241, height = 61, image = ExitNoButtonBG, borderwidth = 0)
-exit_no_button.bind('<Button-1>', cancel)
-hide_widget(exit_no_button)
-
-#--[Not Logged in Dialog]-------------------------------------------------
-AccountPrompDiagBG = Image.open("data/images/AccountPrompt.png")
-AccountPrompBG = ImageTk.PhotoImage(AccountPrompDiagBG)
-account_prompt = tkinter.Label(image = AccountPrompBG)
-hide_widget(account_prompt)
-
-AccountPrompDiagText = Image.open("data/images/AccountPromptText.png")
-AccountPrompText = ImageTk.PhotoImage(AccountPrompDiagText)
-account_text = tkinter.Label(image = AccountPrompText, borderwidth = 0)
-hide_widget(account_text)
-
-OfflineButtonBG = PhotoImage(file = "data/images/Offline.png")
-offline_button = Button(MainWindow, width = 239, height = 72, image = OfflineButtonBG, borderwidth = 0)
-offline_button.bind('<Button-1>', play_offline)
-hide_widget(offline_button)
-
-CreateButtonBG = PhotoImage(file = "data/images/Create.png")
-create_button = Button(MainWindow, width = 239, height = 72, image = CreateButtonBG, borderwidth = 0)
-create_button.bind('<Button-1>', create_account)
-hide_widget(create_button)
-
-LoginButtonBG = PhotoImage(file = "data/images/Login.png")
-login_button = Button(MainWindow, width = 239, height = 72, image = LoginButtonBG, borderwidth = 0)
-login_button.bind('<Button-1>', login_account)
-hide_widget(login_button)
-
-BackAuthButtonBG = PhotoImage(file = "data/images/Back_Account.png")
-back_auth_button = Button(MainWindow, width = 62, height = 60, image = BackAuthButtonBG, borderwidth = 0)
-back_auth_button.bind('<Button-1>', back_auth)
-hide_widget(back_auth_button)
-
-LoginAuthText = Image.open("data/images/LoginAuth.png")
-LoginAuth = ImageTk.PhotoImage(LoginAuthText)
-login_auth = tkinter.Label(image = LoginAuth, borderwidth = 0)
-hide_widget(login_auth)
-
-CreateAccText = Image.open("data/images/CreateAcc.png")
-CreateAcc = ImageTk.PhotoImage(CreateAccText)
-create_acc = tkinter.Label(image = CreateAcc, borderwidth = 0)
-hide_widget(create_acc)
-
-#--[Input Credential Dialog]----------------------------------------------
-custom_font = font.Font(family = 'Segoe UI', size = 20)
-
-username = Entry(MainWindow, width = 35)
-username['font'] = custom_font
-hide_widget(username)
-
-password = Entry(MainWindow, width = 35, show = "*")
-password['font'] = custom_font
-hide_widget(password)
-
-password_confirm = Entry(MainWindow, width = 35, show = "*")
-password_confirm['font'] = custom_font
-hide_widget(password_confirm)
-
-auth_message = Label(MainWindow, justify = 'left')
-auth_message['font'] = custom_font
-hide_widget(auth_message)
-
-login_success = Label(MainWindow, anchor = 'c', justify = 'center')
-login_success['font'] = custom_font
-login_success.config(font = ("Segoe UI", 28))
-hide_widget(login_success)
-
-#--[Sync Dialog]----------------------------------------------------------
-SyncPromptText = Image.open("data/images/SyncPromptMsg.png")
-SyncPrompt = ImageTk.PhotoImage(SyncPromptText)
-sync_prompt = tkinter.Label(image = SyncPrompt, borderwidth = 0)
-hide_widget(sync_prompt)
-
-GoToSyncBG = PhotoImage(file = "data/images/SyncContinue.png")
-go_to_sync = Button(MainWindow, width = 239, height = 72, image = GoToSyncBG, borderwidth = 0)
-go_to_sync.bind('<Button-1>', sync)
-hide_widget(go_to_sync)
-
-#--[Logout Dialog]--------------------------------------------------------
-LogoutPromptText = Image.open("data/images/LogoutPrompt.png")
-LogoutPrompt = ImageTk.PhotoImage(LogoutPromptText)
-logout_prompt = tkinter.Label(image = LogoutPrompt, borderwidth = 0)
-hide_widget(logout_prompt)
-
-logout_button = Button(MainWindow, width = 241, height = 61, image = ExitYesButtonBG, borderwidth = 0)
-logout_button.bind('<Button-1>', logout)
-hide_widget(logout_button)
-
-cancel_logout_button = Button(MainWindow, width = 241, height = 61, image = ExitNoButtonBG, borderwidth = 0)
-cancel_logout_button.bind('<Button-1>', to_main_menu)
-hide_widget(cancel_logout_button)
-
-#--[Not Logged in Error Dialog]-------------------------------------------
-NoSyncText = Image.open("data/images/NoSync.png")
-NoSync = ImageTk.PhotoImage(NoSyncText)
-no_sync = tkinter.Label(image = NoSync, borderwidth = 0)
-hide_widget(no_sync)
-
-OkButtonBG = PhotoImage(file = "data/images/Ok.png")
-ok_button = Button(MainWindow, width = 241, height = 61, image = OkButtonBG, borderwidth = 0)
-ok_button.bind('<Button-1>', login_affirm)
-hide_widget(ok_button)
-
-#--[User Profile Page]----------------------------------------------------
-DiagBoxBG = Image.open("data/images/DiagBox.png")
-DiagBox = ImageTk.PhotoImage(DiagBoxBG)
-diag_box = tkinter.Label(image = DiagBox, borderwidth = 0)
-hide_widget(diag_box)
-
-profile_name = Label(MainWindow, justify = 'left')
-profile_name['font'] = custom_font
-profile_name.config(font = ("Segoe UI", 44))
-hide_widget(profile_name)
-
-profile_stat = Label(MainWindow, justify = 'right', text = "Times Played : \nEasy : \nNormal : \nHard : \n Expert : ")
-profile_stat['font'] = custom_font
-profile_stat.config(font = ("Segoe UI", 28))
-hide_widget(profile_stat)
-
-profile_stat_game = Label(MainWindow, justify = 'left')
-profile_stat_game['font'] = custom_font
-profile_stat_game.config(font = ("Segoe UI", 28))
-hide_widget(profile_stat_game)
-
-MaleProfilePicBG = Image.open("data/images/Male.png")
-MaleProfilePic = ImageTk.PhotoImage(MaleProfilePicBG)
-male_profile_pic = tkinter.Label(image = MaleProfilePic, borderwidth = 0)
-hide_widget(male_profile_pic)
-
-FemaleProfilePicBG = Image.open("data/images/Female.png")
-FemaleProfilePic = ImageTk.PhotoImage(FemaleProfilePicBG)
-female_profile_pic = tkinter.Label(image = FemaleProfilePic, borderwidth = 0)
-hide_widget(female_profile_pic)
-
-ChangeGenderBG = PhotoImage(file = "data/images/Gender.png")
-change_gender_button = Button(MainWindow, width = 76, height = 76, image = ChangeGenderBG, borderwidth = 0)
-change_gender_button.bind('<Button-1>', change_gender)
-hide_widget(change_gender_button)
-
-#--[Difficulty Selection Page]--------------------------------------------
-SelectDifficultyBG = Image.open("data/images/SelectDifficulty.png")
-SelectDifficulty = ImageTk.PhotoImage(SelectDifficultyBG)
-select_difficulty = tkinter.Label(image = SelectDifficulty, borderwidth = 0)
-hide_widget(select_difficulty)
-
-EasyDifficultyBG = PhotoImage(file = "data/images/Easy.png")
-easy_difficulty_button = Button(MainWindow, width = 288, height = 418, image = EasyDifficultyBG, borderwidth = 0)
-easy_difficulty_button.bind('<Button-1>', easy_gamemode)
-hide_widget(easy_difficulty_button)
-
-NormalDifficultyBG = PhotoImage(file = "data/images/Normal.png")
-normal_difficulty_button = Button(MainWindow, width = 288, height = 418, image = NormalDifficultyBG, borderwidth = 0)
-normal_difficulty_button.bind('<Button-1>', normal_gamemode)
-hide_widget(normal_difficulty_button)
-
-HardDifficultyBG = PhotoImage(file = "data/images/Hard.png")
-hard_difficulty_button = Button(MainWindow, width = 288, height = 418, image = HardDifficultyBG, borderwidth = 0)
-hard_difficulty_button.bind('<Button-1>', hard_gamemode)
-hide_widget(hard_difficulty_button)
-
-ExpertDifficultyBG = PhotoImage(file = "data/images/Expert.png")
-expert_difficulty_button = Button(MainWindow, width = 288, height = 418, image = ExpertDifficultyBG, borderwidth = 0)
-expert_difficulty_button.bind('<Button-1>', expert_gamemode)
-hide_widget(expert_difficulty_button)
-
-#--[Pre-Countdown Text]---------------------------------------------------
-pre_countdown = Label(MainWindow, width = 25)
-pre_countdown['font'] = custom_font
-pre_countdown.config(font = ("Segoe UI", 40))
-hide_widget(pre_countdown)
-
-#--[Random Integer Text]--------------------------------------------------
-rand_int_text = Label(MainWindow, width = 15)
-rand_int_text['font'] = custom_font
-rand_int_text.config(font = ("Segoe UI", 100))
-hide_widget(rand_int_text)
-
-#--[Answer Field]---------------------------------------------------------
-user_answer = Entry(MainWindow, width = 20)
-user_answer['font'] = custom_font
-user_answer.config(font = ("Segoe UI", 40))
-user_answer.bind('<Key>', check_answer)
-hide_widget(user_answer)
-
-#--[Cancel Ongoing Game Dialog]-------------------------------------------
-CancelGameBG = Image.open("data/images/CancelGame.png")
-CancelGame = ImageTk.PhotoImage(CancelGameBG)
-cancel_game = tkinter.Label(image = CancelGame, borderwidth = 0)
-hide_widget(cancel_game)
-
-CancelGameYes = PhotoImage(file = "data/images/Yes.png")
-cancel_game_yes = Button(MainWindow, width = 241, height = 61, image = CancelGameYes, borderwidth = 0)
-cancel_game_yes.bind('<Button-1>', prompt_exit)
-hide_widget(cancel_game_yes)
-
-CancelGameNo = PhotoImage(file = "data/images/No.png")
-cancel_game_no = Button(MainWindow, width = 241, height = 61, image = CancelGameNo, borderwidth = 0)
-cancel_game_no.bind('<Button-1>', prompt_exit_cancel)
-hide_widget(cancel_game_no)
-
-#--[Result Affirm Button]-------------------------------------------------
-FinishGame = PhotoImage(file = "data/images/Ok.png")
-finish_game = Button(MainWindow, width = 241, height = 61, image = FinishGame, borderwidth = 0)
-finish_game.bind('<Button-1>', ok_result)
-hide_widget(finish_game)
-
-MainWindow.mainloop()
+    
+if __name__ == "__main__":
+    app = AceMath()
+    app.mainloop()
