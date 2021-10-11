@@ -11,7 +11,7 @@
 #===============================================================#
 
 import winsound, random, time
-from tkinter import Canvas, PhotoImage, Button, Label, Entry, Tk, font
+from tkinter import Canvas, PhotoImage, Button, Label, Entry, Place, Tk, font
 from firebase_admin import initialize_app, credentials, db
 from PIL import ImageTk, Image
 
@@ -25,9 +25,7 @@ data = "data/"
 class AceMath(Tk):
     def __init__(self):
         super().__init__()
-
-        self.stopwatch = Stopwatch()
-
+        
         #-------------------------------------------------------------------------
         # Program Configuration
         #-------------------------------------------------------------------------
@@ -42,6 +40,7 @@ class AceMath(Tk):
         self.write_data("isStopwatchPaused", "False")
         self.write_data("isUserInGame", "False")
         self.write_data("currentQuestionNumber", 0)
+        self.stopwatch = Stopwatch()
         winsound.PlaySound('data/sounds/BGMusic.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
 
         #-------------------------------------------------------------------------
@@ -60,38 +59,33 @@ class AceMath(Tk):
 
         #--[Play Button]----------------------------------------------------------
         self.PlayButtonBG = PhotoImage(file = data + "images/Play.png")
-        self.play_button = Button(self, width = 274, height = 109, image = self.PlayButtonBG, borderwidth = 0)
+        self.play_button = Button(self, image = self.PlayButtonBG, borderwidth = 0, command = self.play)
         self.play_button.place(x = 80, y = 425)
-        self.play_button.bind('<Button-1>', self.play)
 
         #--[Sync Button]----------------------------------------------------------
         self.SyncButtonBG = PhotoImage(file = data + "images/Sync.png")
-        self.sync_button = Button(self, width = 276, height = 107, image = self.SyncButtonBG, borderwidth = 0)
+        self.sync_button = Button(self, image = self.SyncButtonBG, borderwidth = 0, command = self.sync)
         self.sync_button.place(x = 80, y = 558)
-        self.sync_button.bind('<Button-1>', self.sync)
 
         #--[Profile Button]-------------------------------------------------------
         self.ProfileButtonBG = PhotoImage(file = data + "images/Profile.png")
-        self.profile_button = Button(self, width = 363, height = 94, image = self.ProfileButtonBG, borderwidth = 0)
+        self.profile_button = Button(self, image = self.ProfileButtonBG, borderwidth = 0, command = self.profile)
         self.profile_button.place(x = 80, y = 690)
-        self.profile_button.bind('<Button-1>', self.profile)
 
         #--[About Button]---------------------------------------------------------
         self.AboutButtonBG = PhotoImage(file = data + "images/About.png")
-        self.about_button = Button(self, width = 335, height = 90, image = self.AboutButtonBG, borderwidth = 0)
+        self.about_button = Button(self, image = self.AboutButtonBG, borderwidth = 0, command = self.about)
         self.about_button.place(x = 80, y = 810)
-        self.about_button.bind('<Button-1>', self.about)
 
         #--[Exit Button]----------------------------------------------------------
         self.ExitButtonBG = PhotoImage(file = data + "images/Exit.png")
-        self.exit_button = Button(self, width = 252, height = 87, image = self.ExitButtonBG, borderwidth = 0)
+        self.exit_button = Button(self, image = self.ExitButtonBG, borderwidth = 0)
         self.exit_button.place(x = 80, y = 923)
         self.exit_button.bind('<Button-1>', self.close_confirmation)
 
         #--[Back Button]----------------------------------------------------------
         self.BackButtonBG = PhotoImage(file=data + "images/Back.png")
-        self.back_button = Button(self, width = 314, height = 95, image = self.BackButtonBG, borderwidth = 0)
-        self.back_button.bind('<Button-1>', self.to_main_menu)
+        self.back_button = Button(self, image = self.BackButtonBG, borderwidth = 0, command = self.to_main_menu)
         self.hide_widget(self.back_button)
 
         #--[About Description]----------------------------------------------------
@@ -108,44 +102,38 @@ class AceMath(Tk):
         self.hide_widget(self.exit_confirm)
 
         self.ExitYesButtonBG = PhotoImage(file = data + "images/Yes.png")
-        self.exit_yes_button = Button(self, width = 241, height = 61, image = self.ExitYesButtonBG, borderwidth = 0)
-        self.exit_yes_button.bind('<Button-1>', self.close)
+        self.exit_yes_button = Button(self, image = self.ExitYesButtonBG, borderwidth = 0, command = self.close)
         self.hide_widget(self.exit_yes_button)
 
         self.ExitNoButtonBG = PhotoImage(file = data + "images/No.png")
-        self.exit_no_button = Button(self, width = 241, height = 61, image = self.ExitNoButtonBG, borderwidth = 0)
-        self.exit_no_button.bind('<Button-1>', self.cancel)
+        self.exit_no_button = Button(self, image = self.ExitNoButtonBG, borderwidth = 0, command = self.cancel)
         self.hide_widget(self.exit_no_button)
 
         #--[Not Logged in Dialog]-------------------------------------------------
-        self.AccountPrompDiagBG = Image.open(data + "images/AccountPrompt.png")
-        self.AccountPrompBG = ImageTk.PhotoImage(self.AccountPrompDiagBG)
-        self.account_prompt = Label(image = self.AccountPrompBG)
+        self.AccountPromptDiagBG = Image.open(data + "images/AccountPrompt.png")
+        self.AccountPromptBG = ImageTk.PhotoImage(self.AccountPromptDiagBG)
+        self.account_prompt = Label(image = self.AccountPromptBG)
         self.hide_widget(self.account_prompt)
 
-        self.AccountPrompDiagText = Image.open(data + "images/AccountPromptText.png")
-        self.AccountPrompText = ImageTk.PhotoImage(self.AccountPrompDiagText)
-        self.account_text = Label(image = self.AccountPrompText, borderwidth = 0)
+        self.AccountPromptDiagText = Image.open(data + "images/AccountPromptText.png")
+        self.AccountPromptText = ImageTk.PhotoImage(self.AccountPromptDiagText)
+        self.account_text = Label(image = self.AccountPromptText, borderwidth = 0)
         self.hide_widget(self.account_text)
 
         self.OfflineButtonBG = PhotoImage(file = data + "images/Offline.png")
-        self.offline_button = Button(self, width = 239, height = 72, image = self.OfflineButtonBG, borderwidth = 0)
-        self.offline_button.bind('<Button-1>', self.play_offline)
+        self.offline_button = Button(self, image = self.OfflineButtonBG, borderwidth = 0, command = self.play_offline)
         self.hide_widget(self.offline_button)
 
         self.CreateButtonBG = PhotoImage(file = data + "images/Create.png")
-        self.create_button = Button(self, width = 239, height = 72, image = self.CreateButtonBG, borderwidth = 0)
-        self.create_button.bind('<Button-1>', self.create_account)
+        self.create_button = Button(self, image = self.CreateButtonBG, borderwidth = 0, command = self.create_account)
         self.hide_widget(self.create_button)
 
         self.LoginButtonBG = PhotoImage(file = data + "images/Login.png")
-        self.login_button = Button(self, width = 239, height = 72, image = self.LoginButtonBG, borderwidth = 0)
-        self.login_button.bind('<Button-1>', self.login_account)
+        self.login_button = Button(self, image = self.LoginButtonBG, borderwidth = 0, command = self.login_account)
         self.hide_widget(self.login_button)
 
         self.BackAuthButtonBG = PhotoImage(file = data + "images/Back_Account.png")
-        self.back_auth_button = Button(self, width = 62, height = 60, image = self.BackAuthButtonBG, borderwidth = 0)
-        self.back_auth_button.bind('<Button-1>', self.back_auth)
+        self.back_auth_button = Button(self, image = self.BackAuthButtonBG, borderwidth = 0, command = self.back_auth)
         self.hide_widget(self.back_auth_button)
 
         self.LoginAuthText = Image.open(data + "images/LoginAuth.png")
@@ -162,23 +150,23 @@ class AceMath(Tk):
         self.custom_font = font.Font(family = 'Segoe UI', size = 20)
 
         self.username = Entry(self, width = 35)
-        self.username['font'] = self.custom_font
+        self.username["font"] = self.custom_font
         self.hide_widget(self.username)
 
         self.password = Entry(self, width = 35, show = "*")
-        self.password['font'] = self.custom_font
+        self.password["font"] = self.custom_font
         self.hide_widget(self.password)
 
         self.password_confirm = Entry(self, width = 35, show = "*")
-        self.password_confirm['font'] = self.custom_font
+        self.password_confirm["font"] = self.custom_font
         self.hide_widget(self.password_confirm)
 
         self.auth_message = Label(self, justify = 'left')
-        self.auth_message['font'] = self.custom_font
+        self.auth_message["font"] = self.custom_font
         self.hide_widget(self.auth_message)
 
         self.login_success = Label(self, anchor = 'c', justify = 'center')
-        self.login_success['font'] = self.custom_font
+        self.login_success["font"] = self.custom_font
         self.login_success.config(font = ("Segoe UI", 28))
         self.hide_widget(self.login_success)
 
@@ -189,8 +177,7 @@ class AceMath(Tk):
         self.hide_widget(self.sync_prompt)
 
         self.GoToSyncBG = PhotoImage(file = data + "images/SyncContinue.png")
-        self.go_to_sync = Button(self, width = 239, height = 72, image = self.GoToSyncBG, borderwidth = 0)
-        self.go_to_sync.bind('<Button-1>', self.sync)
+        self.go_to_sync = Button(self, image = self.GoToSyncBG, borderwidth = 0, command = self.sync)
         self.hide_widget(self.go_to_sync)
 
         #--[Logout Dialog]--------------------------------------------------------
@@ -199,12 +186,10 @@ class AceMath(Tk):
         self.logout_prompt = Label(image = self.LogoutPrompt, borderwidth = 0)
         self.hide_widget(self.logout_prompt)
 
-        self.logout_button = Button(self, width = 241, height = 61, image = self.ExitYesButtonBG, borderwidth = 0)
-        self.logout_button.bind('<Button-1>', self.logout)
+        self.logout_button = Button(self, image = self.ExitYesButtonBG, borderwidth = 0, command = self.logout)
         self.hide_widget(self.logout_button)
 
-        self.cancel_logout_button = Button(self, width = 241, height = 61, image = self.ExitNoButtonBG, borderwidth = 0)
-        self.cancel_logout_button.bind('<Button-1>', self.to_main_menu)
+        self.cancel_logout_button = Button(self, image = self.ExitNoButtonBG, borderwidth = 0, command = self.to_main_menu)
         self.hide_widget(self.cancel_logout_button)
 
         #--[Not Logged in Error Dialog]-------------------------------------------
@@ -214,8 +199,7 @@ class AceMath(Tk):
         self.hide_widget(self.no_sync)
 
         self.OkButtonBG = PhotoImage(file = data + "images/Ok.png")
-        self.ok_button = Button(self, width = 241, height = 61, image = self.OkButtonBG, borderwidth = 0)
-        self.ok_button.bind('<Button-1>', self.login_affirm)
+        self.ok_button = Button(self, image = self.OkButtonBG, borderwidth = 0, command = self.login_affirm)
         self.hide_widget(self.ok_button)
 
         #--[User Profile Page]----------------------------------------------------
@@ -225,17 +209,17 @@ class AceMath(Tk):
         self.hide_widget(self.diag_box)
 
         self.profile_name = Label(self, justify = 'left')
-        self.profile_name['font'] = self.custom_font
+        self.profile_name["font"] = self.custom_font
         self.profile_name.config(font = ("Segoe UI", 44))
         self.hide_widget(self.profile_name)
 
         self.profile_stat = Label(self, justify = 'right', text = "Times Played : \nEasy : \nNormal : \nHard : \n Expert : ")
-        self.profile_stat['font'] = self.custom_font
+        self.profile_stat["font"] = self.custom_font
         self.profile_stat.config(font = ("Segoe UI", 28))
         self.hide_widget(self.profile_stat)
 
         self.profile_stat_game = Label(self, justify = 'left')
-        self.profile_stat_game['font'] = self.custom_font
+        self.profile_stat_game["font"] = self.custom_font
         self.profile_stat_game.config(font = ("Segoe UI", 28))
         self.hide_widget(self.profile_stat_game)
 
@@ -250,8 +234,7 @@ class AceMath(Tk):
         self.hide_widget(self.female_profile_pic)
 
         self.ChangeGenderBG = PhotoImage(file = data + "images/Gender.png")
-        self.change_gender_button = Button(self, width = 76, height = 76, image = self.ChangeGenderBG, borderwidth = 0)
-        self.change_gender_button.bind('<Button-1>', self.change_gender)
+        self.change_gender_button = Button(self, image = self.ChangeGenderBG, borderwidth = 0, command = self.change_gender)
         self.hide_widget(self.change_gender_button)
 
         #--[Difficulty Selection Page]--------------------------------------------
@@ -261,40 +244,36 @@ class AceMath(Tk):
         self.hide_widget(self.select_difficulty)
 
         self.EasyDifficultyBG = PhotoImage(file = data + "images/Easy.png")
-        self.easy_difficulty_button = Button(self, width = 288, height = 418, image = self.EasyDifficultyBG, borderwidth = 0)
-        self.easy_difficulty_button.bind('<Button-1>', self.easy_gamemode)
+        self.easy_difficulty_button = Button(self, image = self.EasyDifficultyBG, borderwidth = 0, command = self.easy_gamemode)
         self.hide_widget(self.easy_difficulty_button)
 
         self.NormalDifficultyBG = PhotoImage(file = data + "images/Normal.png")
-        self.normal_difficulty_button = Button(self, width = 288, height = 418, image = self.NormalDifficultyBG, borderwidth = 0)
-        self.normal_difficulty_button.bind('<Button-1>', self.normal_gamemode)
+        self.normal_difficulty_button = Button(self, image = self.NormalDifficultyBG, borderwidth = 0, command = self.normal_gamemode)
         self.hide_widget(self.normal_difficulty_button)
 
         self.HardDifficultyBG = PhotoImage(file = data + "images/Hard.png")
-        self.hard_difficulty_button = Button(self, width = 288, height = 418, image = self.HardDifficultyBG, borderwidth = 0)
-        self.hard_difficulty_button.bind('<Button-1>', self.hard_gamemode)
+        self.hard_difficulty_button = Button(self, image = self.HardDifficultyBG, borderwidth = 0, command = self.hard_gamemode)
         self.hide_widget(self.hard_difficulty_button)
 
         self.ExpertDifficultyBG = PhotoImage(file = data + "images/Expert.png")
-        self.expert_difficulty_button = Button(self, width = 288, height = 418, image = self.ExpertDifficultyBG, borderwidth = 0)
-        self.expert_difficulty_button.bind('<Button-1>', self.expert_gamemode)
+        self.expert_difficulty_button = Button(self, image = self.ExpertDifficultyBG, borderwidth = 0, command = self.expert_gamemode)
         self.hide_widget(self.expert_difficulty_button)
 
         #--[Pre-Countdown Text]---------------------------------------------------
         self.pre_countdown = Label(self, width = 25)
-        self.pre_countdown['font'] = self.custom_font
+        self.pre_countdown["font"] = self.custom_font
         self.pre_countdown.config(font = ("Segoe UI", 40))
         self.hide_widget(self.pre_countdown)
 
         #--[Random Integer Text]--------------------------------------------------
         self.rand_int_text = Label(self, width = 15)
-        self.rand_int_text['font'] = self.custom_font
+        self.rand_int_text["font"] = self.custom_font
         self.rand_int_text.config(font = ("Segoe UI", 100))
         self.hide_widget(self.rand_int_text)
 
         #--[Answer Field]---------------------------------------------------------
         self.user_answer = Entry(self, width = 20)
-        self.user_answer['font'] = self.custom_font
+        self.user_answer["font"] = self.custom_font
         self.user_answer.config(font = ("Segoe UI", 40))
         self.user_answer.bind('<Key>', self.check_answer)
         self.hide_widget(self.user_answer)
@@ -306,19 +285,16 @@ class AceMath(Tk):
         self.hide_widget(self.cancel_game)
 
         self.CancelGameYes = PhotoImage(file = data + "images/Yes.png")
-        self.cancel_game_yes = Button(self, width = 241, height = 61, image = self.CancelGameYes, borderwidth = 0)
-        self.cancel_game_yes.bind('<Button-1>', self.prompt_exit)
+        self.cancel_game_yes = Button(self, image = self.CancelGameYes, borderwidth = 0, command = self.prompt_exit)
         self.hide_widget(self.cancel_game_yes)
 
         self.CancelGameNo = PhotoImage(file = data + "images/No.png")
-        self.cancel_game_no = Button(self, width = 241, height = 61, image = self.CancelGameNo, borderwidth = 0)
-        self.cancel_game_no.bind('<Button-1>', self.prompt_exit_cancel)
+        self.cancel_game_no = Button(self, image = self.CancelGameNo, borderwidth = 0, command = self.prompt_exit_cancel)
         self.hide_widget(self.cancel_game_no)
 
         #--[Result Affirm Button]-------------------------------------------------
         self.FinishGame = PhotoImage(file = data + "images/Ok.png")
-        self.finish_game = Button(self, width = 241, height = 61, image = self.FinishGame, borderwidth = 0)
-        self.finish_game.bind('<Button-1>', self.ok_result)
+        self.finish_game = Button(self, image = self.FinishGame, borderwidth = 0, command = self.ok_result)
         self.hide_widget(self.finish_game)
 
     #-------------------------------------------------------------------------
@@ -428,7 +404,7 @@ class AceMath(Tk):
         self.show_canvas(self.BGCanvas)
 
     #--[Moving to MainMenu Event]---------------------------------------------
-    def to_main_menu(self, event):
+    def to_main_menu(self):
         if self.read_data("isUserInGame") == "True":
             self.stopwatch.stop()
             hideWidgetList = [self.pre_countdown, self.rand_int_text, self.user_answer]
@@ -455,7 +431,7 @@ class AceMath(Tk):
             self.show_canvas(self.BGFullCanvas)   
 
     #--[BACK Button (in auth screen) Event]-----------------------------------
-    def back_auth(self, event):
+    def back_auth(self):
         hideWidgetList = [self.login_auth, self.back_auth_button, self.auth_message, self.username, self.password, self.create_acc, self.password_confirm]
         for widget in hideWidgetList:
             self.hide_widget(widget)
@@ -468,7 +444,7 @@ class AceMath(Tk):
         self.write_data("isUserInCredentialScreen", "False")
     
     #--[Check if User Logged in]----------------------------------------------
-    def play(self, event):
+    def play(self):
         self.out_main_menu()
         # If not login, prompt player to play offline or go back to Sync menu
         if self.read_data("isFirebaseConnected") == "False":
@@ -476,14 +452,14 @@ class AceMath(Tk):
             for widget in range(len(showWidgetList)):
                 self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
         else:
-            self.difficulty_select(event)
+            self.difficulty_select()
 
     #--[Play Offline]---------------------------------------------------------
-    def play_offline(self, event):
-        self.difficulty_select(event)
+    def play_offline(self):
+        self.difficulty_select()
 
     #--[Difficulty Selection Page]--------------------------------------------
-    def difficulty_select(self, event):
+    def difficulty_select(self):
         hideWidgetList = [self.account_prompt, self.sync_prompt, self.go_to_sync, self.offline_button]
         for widget in hideWidgetList:
             self.hide_widget(widget)
@@ -493,7 +469,7 @@ class AceMath(Tk):
                 self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
 
     #--[SYNC Page]------------------------------------------------------------
-    def sync(self, event):
+    def sync(self):
         self.out_main_menu()
         # Prompt user to choose whether they want to create an account, connect to existing account, or play offline
         if self.read_data("isFirebaseConnected") == "False":
@@ -509,7 +485,7 @@ class AceMath(Tk):
                 self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
 
     #--[PROFILE Page]---------------------------------------------------------
-    def profile(self, event):
+    def profile(self):
         if self.read_data("isFirebaseConnected") == "False":
             showWidgetList = [[self.account_prompt, 500, 380], [self.no_sync, 650, 550], [self.ok_button, 860, 683]]
             for widget in range(len(showWidgetList)):
@@ -539,7 +515,7 @@ class AceMath(Tk):
                 self.show_widget(self.female_profile_pic, 300, 300)
 
     #--[ABOUT Page]-----------------------------------------------------------
-    def about(self, event):
+    def about(self):
         self.out_main_menu()
         self.hide_canvas(self.BGCanvas)
         self.show_canvas(self.AboutCanvas)
@@ -547,7 +523,7 @@ class AceMath(Tk):
         self.back_button.lift()
 
     #--[Register Account Page]------------------------------------------------
-    def create_account(self, event):
+    def create_account(self):
         if self.read_data("isUserInCredentialScreen") == "False":
             hideWidgetList = [self.offline_button, self.login_button, self.account_text, self.back_button]
             for widget in hideWidgetList:
@@ -572,7 +548,7 @@ class AceMath(Tk):
                 self.auth_message.config(text="Account created successfully. Please go back and click on Login.", fg = "green")
 
     #--[Login Account Page]---------------------------------------------------
-    def login_account(self, event):
+    def login_account(self):
         if self.read_data("isUserInCredentialScreen") == "False":
             hideWidgetList = [self.offline_button, self.create_button, self.account_text, self.back_button]
             for widget in hideWidgetList:
@@ -604,21 +580,21 @@ class AceMath(Tk):
                 self.password.delete(0, 'end')
 
     #--[Login Affirm]---------------------------------------------------------
-    def login_affirm(self, event):
+    def login_affirm(self):
         hideWidgetList = [self.ok_button, self.no_sync, self.account_prompt, self.login_success]
         for widget in hideWidgetList:
             self.hide_widget(widget)
-        self.to_main_menu(event)
+        self.to_main_menu()
 
     #--[Logout]---------------------------------------------------------------
-    def logout(self, event):
+    def logout(self):
         self.write_data("isUserInCredentialScreen", "False")
         self.write_data("firebaseUsername", "null")
         self.write_data("isFirebaseConnected", "False")
-        self.to_main_menu(event)
+        self.to_main_menu()
 
     #--[Change Gender]--------------------------------------------------------
-    def change_gender(self, event):
+    def change_gender(self):
         if str(db.reference('Users/' + self.read_data("firebaseUsername") + '/Gender').get()) == "0":
             self.show_widget(self.female_profile_pic, 300, 300)
             self.hide_widget(self.male_profile_pic)
@@ -629,7 +605,7 @@ class AceMath(Tk):
             self.write_to_firebase(self.read_data("firebaseUsername"), "Gender", 0)
 
     #--[Prompt Exit Confirmation While Game is Ongoing]-----------------------
-    def prompt_exit(self, event):
+    def prompt_exit(self):
         hideWidgetList = [self.diag_box, self.pre_countdown, self.user_answer, self.rand_int_text, self.account_prompt, self.cancel_game, self.cancel_game_yes, self.cancel_game_no]
         for widget in hideWidgetList:
             self.hide_widget(widget)
@@ -637,10 +613,10 @@ class AceMath(Tk):
         self.write_data("isStopwatchPaused", "False")
         self.write_data("isGameStarted", "False")
         winsound.PlaySound('data/sounds/BGMusic.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
-        self.to_main_menu(event)
+        self.to_main_menu()
 
     #--[Cancel Exit Confirmation While Game is Ongoing]-----------------------
-    def prompt_exit_cancel(self, event):
+    def prompt_exit_cancel(self):
         hideWidgetList = [self.account_prompt, self.cancel_game, self.cancel_game_yes, self.cancel_game_no]
         for widget in hideWidgetList:
             self.hide_widget(widget)
@@ -656,7 +632,7 @@ class AceMath(Tk):
         self.stopwatch.start()
 
     #--[Easy Gamemode]--------------------------------------------------------
-    def easy_gamemode(self, event):
+    def easy_gamemode(self):
         self.write_data("selectedDifficulty", "Easy")
         self.write_data("questionSize", 19)
         self.write_data("minInteger", 0)
@@ -664,7 +640,7 @@ class AceMath(Tk):
         self.start_game()
 
     #--[Normal Gamemode]------------------------------------------------------
-    def normal_gamemode(self, event):
+    def normal_gamemode(self):
         self.write_data("selectedDifficulty", "Normal")
         self.write_data("questionSize", 19)
         self.write_data("minInteger", 10)
@@ -672,7 +648,7 @@ class AceMath(Tk):
         self.start_game()
 
     #--[Hard Gamemode]--------------------------------------------------------
-    def hard_gamemode(self, event):
+    def hard_gamemode(self):
         self.write_data("selectedDifficulty", "Hard")
         self.write_data("questionSize", 19)
         self.write_data("minInteger", 100)
@@ -680,7 +656,7 @@ class AceMath(Tk):
         self.start_game()
 
     #--[Expert Gamemode]------------------------------------------------------
-    def expert_gamemode(self, event):
+    def expert_gamemode(self):
         self.write_data("selectedDifficulty", "Expert")
         self.write_data("questionSize", 19)
         self.write_data("minInteger", 1000)
@@ -743,7 +719,7 @@ class AceMath(Tk):
             self.submit_score()
 
     #--[Check Answer]---------------------------------------------------------
-    def check_answer(self, event):
+    def check_answer(self):
         if self.user_answer.get() == self.read_data("answer"):
             self.write_data("currentQuestionNumber", int(self.read_data("currentQuestionNumber")) + 1)
             self.user_answer.delete(0, 'end')
@@ -766,12 +742,12 @@ class AceMath(Tk):
                 })
 
     #--[Result Affirm]--------------------------------------------------------
-    def ok_result(self, event):
+    def ok_result(self):
         hideWidgetList = [self.diag_box, self.pre_countdown, self.finish_game]
         for widget in hideWidgetList:
             self.hide_widget(widget)
         winsound.PlaySound('data/sounds/BGMusic.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
-        self.to_main_menu(event)
+        self.to_main_menu()
 
     #--[EXIT PROGRAM Confirmation Dialog]-------------------------------------
     def close_confirmation(self, event):
@@ -786,13 +762,13 @@ class AceMath(Tk):
         self.exit_no_button.lift()
 
     #--[Cancel Exit Program Event]--------------------------------------------
-    def cancel(self, event):
+    def cancel(self):
         self.hide_widget(self.exit_confirm)
         self.hide_widget(self.exit_yes_button)
         self.hide_widget(self.exit_no_button)
 
     #--[Exit Program Event]---------------------------------------------------
-    def close(self, event):
+    def close(self):
         self.destroy()
     
 #--[Initialize Stopwatch]-------------------------------------------------
