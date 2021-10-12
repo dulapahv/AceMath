@@ -40,8 +40,8 @@ class AceMath(Tk):
         self.write_data("isStopwatchPaused", "False")
         self.write_data("isUserInGame", "False")
         self.write_data("currentQuestionNumber", 0)
-        self.stopwatch = Stopwatch()
-        winsound.PlaySound('data/sounds/BGMusic.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
+        self.stopwatch = Stopwatch() # create stopwatch object
+        winsound.PlaySound(data + 'sounds/BGMusic.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
 
         #-------------------------------------------------------------------------
         # Assets Initialization
@@ -644,20 +644,19 @@ class AceMath(Tk):
         self.write_data("isUserInGame", "True")
         self.write_data("currentQuestionNumber", 0)
         self.countdown_timer(5)
-        self.summon_question()
+        self.summon_question(int(self.read_data("questionSize")), int(self.read_data("minInteger")), int(self.read_data("maxInteger")))
 
     #--[Summon Question]------------------------------------------------------
-    def summon_question(self):
-        if int(self.read_data("currentQuestionNumber")) <= int(self.read_data("questionSize")):
+    def summon_question(self, questionSize, minInteger, maxInteger):
+        if int(self.read_data("currentQuestionNumber")) <= questionSize:
             showWidgetList = [[self.user_answer, 670, 750], [self.rand_int_text, 400, 350], [self.pre_countdown, 900, 215]]
             for widget in range(len(showWidgetList)):
                 self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
             self.user_answer.focus()
-            int1 = random.randint(int(self.read_data("minInteger")), int(self.read_data("maxInteger")))
-            int2 = random.randint(int(self.read_data("minInteger")), int(self.read_data("maxInteger")))
+            int1, int2 = random.randint(minInteger, maxInteger), random.randint(minInteger, maxInteger)
             self.rand_int_text.config(text = str(int1) + " + " + str(int2))
             self.write_data("answer", int1 + int2)
-            self.pre_countdown.config(text = str(int(self.read_data("currentQuestionNumber")) + 1) + "/" + str(int(self.read_data("questionSize")) + 1), anchor = "e")
+            self.pre_countdown.config(text = str(int(self.read_data("currentQuestionNumber")) + 1) + "/" + str(questionSize + 1), anchor = "e")
         else:  # Game finishes
             hideWidgetList = [self.back_button, self.rand_int_text, self.user_answer]
             for widget in hideWidgetList:
@@ -678,7 +677,7 @@ class AceMath(Tk):
         if self.user_answer.get() == self.read_data("answer"):
             self.write_data("currentQuestionNumber", int(self.read_data("currentQuestionNumber")) + 1)
             self.user_answer.delete(0, 'end')
-            self.summon_question()
+            self.summon_question(int(self.read_data("questionSize")), int(self.read_data("minInteger")), int(self.read_data("maxInteger")))
 
     #--[Submit Score to Firebase Database]------------------------------------
     def submit_score(self):
