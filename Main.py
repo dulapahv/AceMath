@@ -11,7 +11,7 @@
 #===============================================================#
 
 import winsound, random, time
-from tkinter import Canvas, PhotoImage, Button, Label, Entry, Place, Tk, font
+from tkinter import Canvas, PhotoImage, Button, Label, Entry, Tk, font
 from firebase_admin import initialize_app, credentials, db
 from PIL import ImageTk, Image
 
@@ -147,27 +147,19 @@ class AceMath(Tk):
         self.hide_widget(self.create_acc)
 
         #--[Input Credential Dialog]----------------------------------------------
-        self.custom_font = font.Font(family = 'Segoe UI', size = 20)
-
-        self.username = Entry(self, width = 35)
-        self.username["font"] = self.custom_font
+        self.username = Entry(self, width = 35, font = ("Segoe UI", 20))
         self.hide_widget(self.username)
 
-        self.password = Entry(self, width = 35, show = "*")
-        self.password["font"] = self.custom_font
+        self.password = Entry(self, width = 35, show = "*", font = ("Segoe UI", 20))
         self.hide_widget(self.password)
 
-        self.password_confirm = Entry(self, width = 35, show = "*")
-        self.password_confirm["font"] = self.custom_font
+        self.password_confirm = Entry(self, width = 35, show = "*", font = ("Segoe UI", 20))
         self.hide_widget(self.password_confirm)
 
-        self.auth_message = Label(self, justify = 'left')
-        self.auth_message["font"] = self.custom_font
+        self.auth_message = Label(self, justify = 'left', font = ("Segoe UI", 20))
         self.hide_widget(self.auth_message)
 
-        self.login_success = Label(self, anchor = 'c', justify = 'center')
-        self.login_success["font"] = self.custom_font
-        self.login_success.config(font = ("Segoe UI", 28))
+        self.login_success = Label(self, anchor = 'c', justify = 'center', font = ("Segoe UI", 28))
         self.hide_widget(self.login_success)
 
         #--[Sync Dialog]----------------------------------------------------------
@@ -208,19 +200,13 @@ class AceMath(Tk):
         self.diag_box = Label(image = self.DiagBox, borderwidth = 0)
         self.hide_widget(self.diag_box)
 
-        self.profile_name = Label(self, justify = 'left')
-        self.profile_name["font"] = self.custom_font
-        self.profile_name.config(font = ("Segoe UI", 44))
+        self.profile_name = Label(self, justify = 'left', font = ("Segoe UI", 44))
         self.hide_widget(self.profile_name)
 
-        self.profile_stat = Label(self, justify = 'right', text = "Times Played : \nEasy : \nNormal : \nHard : \n Expert : ")
-        self.profile_stat["font"] = self.custom_font
-        self.profile_stat.config(font = ("Segoe UI", 28))
+        self.profile_stat = Label(self, justify = 'right', text = "Times Played : \nEasy : \nNormal : \nHard : \n Expert : ", font = ("Segoe UI", 28))
         self.hide_widget(self.profile_stat)
 
-        self.profile_stat_game = Label(self, justify = 'left')
-        self.profile_stat_game["font"] = self.custom_font
-        self.profile_stat_game.config(font = ("Segoe UI", 28))
+        self.profile_stat_game = Label(self, justify = 'left', font = ("Segoe UI", 28))
         self.hide_widget(self.profile_stat_game)
 
         self.MaleProfilePicBG = Image.open(data + "images/Male.png")
@@ -244,37 +230,31 @@ class AceMath(Tk):
         self.hide_widget(self.select_difficulty)
 
         self.EasyDifficultyBG = PhotoImage(file = data + "images/Easy.png")
-        self.easy_difficulty_button = Button(self, image = self.EasyDifficultyBG, borderwidth = 0, command = self.easy_gamemode)
+        self.easy_difficulty_button = Button(self, image = self.EasyDifficultyBG, borderwidth = 0, command = lambda: self.difficulty_config(19, 0, 9))
         self.hide_widget(self.easy_difficulty_button)
 
         self.NormalDifficultyBG = PhotoImage(file = data + "images/Normal.png")
-        self.normal_difficulty_button = Button(self, image = self.NormalDifficultyBG, borderwidth = 0, command = self.normal_gamemode)
+        self.normal_difficulty_button = Button(self, image = self.NormalDifficultyBG, borderwidth = 0, command = lambda: self.difficulty_config(19, 10, 99))
         self.hide_widget(self.normal_difficulty_button)
 
         self.HardDifficultyBG = PhotoImage(file = data + "images/Hard.png")
-        self.hard_difficulty_button = Button(self, image = self.HardDifficultyBG, borderwidth = 0, command = self.hard_gamemode)
+        self.hard_difficulty_button = Button(self, image = self.HardDifficultyBG, borderwidth = 0, command = lambda: self.difficulty_config(19, 100, 999))
         self.hide_widget(self.hard_difficulty_button)
 
         self.ExpertDifficultyBG = PhotoImage(file = data + "images/Expert.png")
-        self.expert_difficulty_button = Button(self, image = self.ExpertDifficultyBG, borderwidth = 0, command = self.expert_gamemode)
+        self.expert_difficulty_button = Button(self, image = self.ExpertDifficultyBG, borderwidth = 0, command = lambda: self.difficulty_config(19, 1000, 9999))
         self.hide_widget(self.expert_difficulty_button)
 
         #--[Pre-Countdown Text]---------------------------------------------------
-        self.pre_countdown = Label(self, width = 25)
-        self.pre_countdown["font"] = self.custom_font
-        self.pre_countdown.config(font = ("Segoe UI", 40))
+        self.pre_countdown = Label(self, width = 25, font = ("Segoe UI", 40))
         self.hide_widget(self.pre_countdown)
 
         #--[Random Integer Text]--------------------------------------------------
-        self.rand_int_text = Label(self, width = 15)
-        self.rand_int_text["font"] = self.custom_font
-        self.rand_int_text.config(font = ("Segoe UI", 100))
+        self.rand_int_text = Label(self, width = 15, font = ("Segoe UI", 100))
         self.hide_widget(self.rand_int_text)
 
         #--[Answer Field]---------------------------------------------------------
-        self.user_answer = Entry(self, width = 20)
-        self.user_answer["font"] = self.custom_font
-        self.user_answer.config(font = ("Segoe UI", 40))
+        self.user_answer = Entry(self, width = 20, font = ("Segoe UI", 40))
         self.user_answer.bind('<Key>', self.check_answer)
         self.hide_widget(self.user_answer)
 
@@ -467,6 +447,13 @@ class AceMath(Tk):
                         [self.normal_difficulty_button, 650, 418], [self.hard_difficulty_button, 986, 418], [self.expert_difficulty_button, 1322, 418]]
         for widget in range(len(showWidgetList)):
                 self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
+        
+    #--[Difficulty Configuration]--------------------------------------------------------
+    def difficulty_config(self, questionSize, minInteger, maxInteger):
+        self.write_data("questionSize", questionSize)
+        self.write_data("minInteger", minInteger)
+        self.write_data("maxInteger", maxInteger)
+        self.start_game()
 
     #--[SYNC Page]------------------------------------------------------------
     def sync(self):
@@ -631,38 +618,6 @@ class AceMath(Tk):
         self.write_data("isStopwatchPaused", "False") 
         self.stopwatch.start()
 
-    #--[Easy Gamemode]--------------------------------------------------------
-    def easy_gamemode(self):
-        self.write_data("selectedDifficulty", "Easy")
-        self.write_data("questionSize", 19)
-        self.write_data("minInteger", 0)
-        self.write_data("maxInteger", 9)
-        self.start_game()
-
-    #--[Normal Gamemode]------------------------------------------------------
-    def normal_gamemode(self):
-        self.write_data("selectedDifficulty", "Normal")
-        self.write_data("questionSize", 19)
-        self.write_data("minInteger", 10)
-        self.write_data("maxInteger", 99)
-        self.start_game()
-
-    #--[Hard Gamemode]--------------------------------------------------------
-    def hard_gamemode(self):
-        self.write_data("selectedDifficulty", "Hard")
-        self.write_data("questionSize", 19)
-        self.write_data("minInteger", 100)
-        self.write_data("maxInteger", 999)
-        self.start_game()
-
-    #--[Expert Gamemode]------------------------------------------------------
-    def expert_gamemode(self):
-        self.write_data("selectedDifficulty", "Expert")
-        self.write_data("questionSize", 19)
-        self.write_data("minInteger", 1000)
-        self.write_data("maxInteger", 9999)
-        self.start_game()
-
     #--[Countdown Timer]------------------------------------------------------
     def countdown_timer(self, t):
         winsound.PlaySound(None, winsound.SND_PURGE)
@@ -719,7 +674,7 @@ class AceMath(Tk):
             self.submit_score()
 
     #--[Check Answer]---------------------------------------------------------
-    def check_answer(self):
+    def check_answer(self, event):
         if self.user_answer.get() == self.read_data("answer"):
             self.write_data("currentQuestionNumber", int(self.read_data("currentQuestionNumber")) + 1)
             self.user_answer.delete(0, 'end')
