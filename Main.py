@@ -15,12 +15,17 @@ from tkinter import Canvas, PhotoImage, Button, Label, Entry, Tk, font
 from firebase_admin import initialize_app, credentials, db
 from PIL import ImageTk, Image
 
-#--[Firebase Database Credential and Path]---------------------------------------
-cred = credentials.Certificate('data/acemath-n0miya-firebase-adminsdk-yft0t-e8061fb0b1.json')
-initialize_app(cred, {'databaseURL': 'https://acemath-n0miya-default-rtdb.asia-southeast1.firebasedatabase.app/'})
-
-#--[Program Data Path]---------------------------------------
+#--[Program Data Path]------------------------------------------------------------
+# The default path is "data/" (including slash and quotes)
+# Inside the specified path must exist a folder named "sounds" and "images" (i.e. data/sounds and data/images)
+# Inside the specified path must also exist a Firebase Service Account Key and data.txt (i.e. data/serviceAccountKey.json and data/data.txt)
 data = "data/"
+
+#--[Firebase Database Credential and Path]---------------------------------------
+# The Service Account Key is stored in the default data path (i.e. data/serviceAccountKey)
+# Internet connection is required to authenticate and access database
+cred = credentials.Certificate(data + "serviceAccountKey.json")
+initialize_app(cred, {"databaseURL": "https://acemath-n0miya-default-rtdb.asia-southeast1.firebasedatabase.app/"})
 
 class AceMath(Tk):
     def __init__(self):
@@ -40,8 +45,12 @@ class AceMath(Tk):
         self.write_data("isStopwatchPaused", "False")
         self.write_data("isUserInGame", "False")
         self.write_data("currentQuestionNumber", 0)
-        self.stopwatch = Stopwatch() # create stopwatch object
-        winsound.PlaySound(data + 'sounds/BGMusic.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
+        self.stopwatch = Stopwatch() # Create stopwatch object
+        self.BGMusic = lambda: winsound.PlaySound(data + "sounds/BGMusic.wav", winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
+        self.gameFinishMusic = lambda: winsound.PlaySound(data + "sounds/GameFinish.wav", winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
+        self.gameStartMusic = lambda: winsound.PlaySound(data + "sounds/GameStart.wav", winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
+        self.DifficultySelectedMusic = lambda: winsound.PlaySound(data + "sounds/DifficultySelected.wav", winsound.SND_FILENAME)
+        self.BGMusic()
 
         #-------------------------------------------------------------------------
         # Assets Initialization
@@ -147,19 +156,19 @@ class AceMath(Tk):
         self.hide_widget(self.create_acc)
 
         #--[Input Credential Dialog]----------------------------------------------
-        self.username = Entry(self, width = 35, font = ("Segoe UI", 20))
+        self.username = Entry(self, width = 32, font = ("Comic Sans MS", 20))
         self.hide_widget(self.username)
 
-        self.password = Entry(self, width = 35, show = "*", font = ("Segoe UI", 20))
+        self.password = Entry(self, width = 32, show = "*", font = ("Comic Sans MS", 20))
         self.hide_widget(self.password)
 
-        self.password_confirm = Entry(self, width = 35, show = "*", font = ("Segoe UI", 20))
+        self.password_confirm = Entry(self, width = 32, show = "*", font = ("Comic Sans MS", 20))
         self.hide_widget(self.password_confirm)
 
-        self.auth_message = Label(self, justify = 'left', font = ("Segoe UI", 20))
+        self.auth_message = Label(self, justify = 'left', font = ("Comic Sans MS", 20))
         self.hide_widget(self.auth_message)
 
-        self.login_success = Label(self, anchor = 'c', justify = 'center', font = ("Segoe UI", 28))
+        self.login_success = Label(self, anchor = 'c', justify = 'center', font = ("Comic Sans MS", 28))
         self.hide_widget(self.login_success)
 
         #--[Sync Dialog]----------------------------------------------------------
@@ -200,13 +209,13 @@ class AceMath(Tk):
         self.diag_box = Label(image = self.DiagBox, borderwidth = 0)
         self.hide_widget(self.diag_box)
 
-        self.profile_name = Label(self, justify = 'left', font = ("Segoe UI", 44))
+        self.profile_name = Label(self, justify = 'left', font = ("Comic Sans MS", 44))
         self.hide_widget(self.profile_name)
 
-        self.profile_stat = Label(self, justify = 'right', text = "Times Played : \nEasy : \nNormal : \nHard : \n Expert : ", font = ("Segoe UI", 28))
+        self.profile_stat = Label(self, justify = 'right', text = "Times Played : \nEasy : \nNormal : \nHard : \n Expert : ", font = ("Comic Sans MS", 28))
         self.hide_widget(self.profile_stat)
 
-        self.profile_stat_game = Label(self, justify = 'left', font = ("Segoe UI", 28))
+        self.profile_stat_game = Label(self, justify = 'left', font = ("Comic Sans MS", 28))
         self.hide_widget(self.profile_stat_game)
 
         self.MaleProfilePicBG = Image.open(data + "images/Male.png")
@@ -246,15 +255,15 @@ class AceMath(Tk):
         self.hide_widget(self.expert_difficulty_button)
 
         #--[Pre-Countdown Text]---------------------------------------------------
-        self.pre_countdown = Label(self, width = 25, font = ("Segoe UI", 40))
+        self.pre_countdown = Label(self, width = 25, font = ("Comic Sans MS", 40))
         self.hide_widget(self.pre_countdown)
 
         #--[Random Integer Text]--------------------------------------------------
-        self.rand_int_text = Label(self, width = 15, font = ("Segoe UI", 100))
+        self.rand_int_text = Label(self, width = 15, font = ("Comic Sans MS", 100))
         self.hide_widget(self.rand_int_text)
 
         #--[Answer Field]---------------------------------------------------------
-        self.user_answer = Entry(self, width = 20, font = ("Segoe UI", 40))
+        self.user_answer = Entry(self, width = 20, font = ("Comic Sans MS", 40))
         self.user_answer.bind('<Key>', self.check_answer)
         self.hide_widget(self.user_answer)
 
@@ -277,10 +286,10 @@ class AceMath(Tk):
         self.finish_game = Button(self, image = self.FinishGame, borderwidth = 0, command = self.ok_result)
         self.hide_widget(self.finish_game)
 
-    #-------------------------------------------------------------------------
+    #-----------------------------------------------------------------------------
     # Database
-    #-------------------------------------------------------------------------
-    #--[Create New User in Firebase Database]---------------------------------
+    #-----------------------------------------------------------------------------
+    #--[Create New User in Firebase Database]-------------------------------------
     def create_new_user(self, user_name, user_password):
         user = db.reference('Users')
         user.child(user_name).set({
@@ -304,14 +313,14 @@ class AceMath(Tk):
             }
         })
 
-    #--[Write Data to Firebase Database]--------------------------------------
+    #--[Write Data to Firebase Database]------------------------------------------
     def write_to_firebase(self, user_name, child, data):
         user = db.reference('Users')
         user.child(user_name).update({
             child: data,
         })
 
-    #--[Get Amount of Times User Has Played]----------------------------------
+    #--[Get Amount of Times User Has Played]--------------------------------------
     def sum_times_played(self, user_name):
         easy = db.reference('Users/' + str(user_name) + '/TimesPlayed/Easy').get()
         normal = db.reference('Users/' + str(user_name) + '/TimesPlayed/Normal').get()
@@ -320,29 +329,10 @@ class AceMath(Tk):
         sum_played = easy + normal + hard + expert
         return str(sum_played)
 
-    #-------------------------------------------------------------------------
-    # Canvas and Widget Management
-    #-------------------------------------------------------------------------
-    #--[Hide Canvas]----------------------------------------------------------
-    def hide_canvas(self, canvas):
-        canvas.pack_forget()
-
-    #--[Show Canvas]----------------------------------------------------------
-    def show_canvas(self, canvas):
-        canvas.pack()
-
-    #--[Hide Widget]----------------------------------------------------------
-    def hide_widget(self, widget):
-        widget.place_forget()
-
-    #--[Show Widget]----------------------------------------------------------
-    def show_widget(self, widget, x_coordinate, y_coordinate):
-        widget.place(x = x_coordinate, y = y_coordinate)
-
-    #-------------------------------------------------------------------------
+    #-----------------------------------------------------------------------------
     # Accessing data.txt
-    #-------------------------------------------------------------------------
-    #--[Search and Get Value in data.txt]-------------------------------------
+    #-----------------------------------------------------------------------------
+    #--[Search and Get Value in data.txt]-----------------------------------------
     def read_data(self, string_to_search):
         lineNumber = 0
         with open(data + "data.txt", 'r') as read_obj:
@@ -353,7 +343,7 @@ class AceMath(Tk):
         read_obj.close()
         return value.removeprefix(string_to_search + " = ")
 
-    #--[Search and Replace Value in data.txt]---------------------------------
+    #--[Search and Replace Value in data.txt]-------------------------------------
     def write_data(self, string_to_search, value):
         lineNumber = 0
         with open(data + "data.txt", 'r') as read_obj:
@@ -363,17 +353,36 @@ class AceMath(Tk):
             read_obj.write(filedata)
         read_obj.close()
 
-    #-------------------------------------------------------------------------
+    #-----------------------------------------------------------------------------
+    # Canvas and Widget Management
+    #-----------------------------------------------------------------------------
+    #--[Hide Canvas]--------------------------------------------------------------
+    def hide_canvas(self, canvas):
+        canvas.pack_forget()
+
+    #--[Show Canvas]--------------------------------------------------------------
+    def show_canvas(self, canvas):
+        canvas.pack()
+
+    #--[Hide Widget]--------------------------------------------------------------
+    def hide_widget(self, widget):
+        widget.place_forget()
+
+    #--[Show Widget]--------------------------------------------------------------
+    def show_widget(self, widget, x_coordinate, y_coordinate):
+        widget.place(x = x_coordinate, y = y_coordinate)
+
+    #-----------------------------------------------------------------------------
     # Program Functions
-    #-------------------------------------------------------------------------
-    #--[Toggle Fullscreen]----------------------------------------------------
+    #-----------------------------------------------------------------------------
+    #--[Toggle Fullscreen]--------------------------------------------------------
     def fullscreen(self, event):
         if not self.attributes('-fullscreen'):
             self.attributes('-fullscreen', True)
         else:
             self.attributes('-fullscreen', False)
 
-    #--[Moving out of MainMenu Event]-------------------------------------
+    #--[Moving out of MainMenu Event]---------------------------------------------
     def out_main_menu(self):
         hideWidgetList = [self.play_button, self.sync_button, self.profile_button, self.about_button, self.exit_button, self.exit_confirm, self.exit_no_button, 
                         self.exit_yes_button, self.account_prompt, self.no_sync, self.ok_button]
@@ -383,7 +392,7 @@ class AceMath(Tk):
         self.hide_canvas(self.BGFullCanvas)
         self.show_canvas(self.BGCanvas)
 
-    #--[Moving to MainMenu Event]---------------------------------------------
+    #--[Moving to MainMenu Event]-------------------------------------------------
     def to_main_menu(self):
         if self.read_data("isUserInGame") == "True":
             self.stopwatch.stop()
@@ -410,7 +419,7 @@ class AceMath(Tk):
             self.hide_canvas(self.AboutCanvas)
             self.show_canvas(self.BGFullCanvas)   
 
-    #--[BACK Button (in auth screen) Event]-----------------------------------
+    #--[BACK Button (in auth screen) Event]---------------------------------------
     def back_auth(self):
         hideWidgetList = [self.login_auth, self.back_auth_button, self.auth_message, self.username, self.password, self.create_acc, self.password_confirm]
         for widget in hideWidgetList:
@@ -423,7 +432,7 @@ class AceMath(Tk):
         self.password_confirm.delete(0, 'end')
         self.write_data("isUserInCredentialScreen", "False")
     
-    #--[Check if User Logged in]----------------------------------------------
+    #--[Check if User Logged in]--------------------------------------------------
     def play(self):
         self.out_main_menu()
         # If not login, prompt player to play offline or go back to Sync menu
@@ -434,11 +443,11 @@ class AceMath(Tk):
         else:
             self.difficulty_select()
 
-    #--[Play Offline]---------------------------------------------------------
+    #--[Play Offline]-------------------------------------------------------------
     def play_offline(self):
         self.difficulty_select()
 
-    #--[Difficulty Selection Page]--------------------------------------------
+    #--[Difficulty Selection Page]------------------------------------------------
     def difficulty_select(self):
         hideWidgetList = [self.account_prompt, self.sync_prompt, self.go_to_sync, self.offline_button]
         for widget in hideWidgetList:
@@ -448,14 +457,15 @@ class AceMath(Tk):
         for widget in range(len(showWidgetList)):
                 self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
         
-    #--[Difficulty Configuration]--------------------------------------------------------
+    #--[Difficulty Configuration]-------------------------------------------------
     def difficulty_config(self, questionSize, minInteger, maxInteger):
+        self.DifficultySelectedMusic()
         self.write_data("questionSize", questionSize)
         self.write_data("minInteger", minInteger)
         self.write_data("maxInteger", maxInteger)
         self.start_game()
 
-    #--[SYNC Page]------------------------------------------------------------
+    #--[SYNC Page]----------------------------------------------------------------
     def sync(self):
         self.out_main_menu()
         # Prompt user to choose whether they want to create an account, connect to existing account, or play offline
@@ -471,7 +481,7 @@ class AceMath(Tk):
             for widget in range(len(showWidgetList)):
                 self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
 
-    #--[PROFILE Page]---------------------------------------------------------
+    #--[PROFILE Page]-------------------------------------------------------------
     def profile(self):
         if self.read_data("isFirebaseConnected") == "False":
             showWidgetList = [[self.account_prompt, 500, 380], [self.no_sync, 650, 550], [self.ok_button, 860, 683]]
@@ -501,7 +511,7 @@ class AceMath(Tk):
             else:
                 self.show_widget(self.female_profile_pic, 300, 300)
 
-    #--[ABOUT Page]-----------------------------------------------------------
+    #--[ABOUT Page]---------------------------------------------------------------
     def about(self):
         self.out_main_menu()
         self.hide_canvas(self.BGCanvas)
@@ -509,7 +519,7 @@ class AceMath(Tk):
         self.show_widget(self.back_button, 80, 20)
         self.back_button.lift()
 
-    #--[Register Account Page]------------------------------------------------
+    #--[Register Account Page]----------------------------------------------------
     def create_account(self):
         if self.read_data("isUserInCredentialScreen") == "False":
             hideWidgetList = [self.offline_button, self.login_button, self.account_text, self.back_button]
@@ -534,7 +544,7 @@ class AceMath(Tk):
                 self.hide_widget(self.create_button)
                 self.auth_message.config(text="Account created successfully. Please go back and click on Login.", fg = "green")
 
-    #--[Login Account Page]---------------------------------------------------
+    #--[Login Account Page]-------------------------------------------------------
     def login_account(self):
         if self.read_data("isUserInCredentialScreen") == "False":
             hideWidgetList = [self.offline_button, self.create_button, self.account_text, self.back_button]
@@ -566,21 +576,21 @@ class AceMath(Tk):
                 self.username.delete(0, 'end')
                 self.password.delete(0, 'end')
 
-    #--[Login Affirm]---------------------------------------------------------
+    #--[Login Affirm]-------------------------------------------------------------
     def login_affirm(self):
         hideWidgetList = [self.ok_button, self.no_sync, self.account_prompt, self.login_success]
         for widget in hideWidgetList:
             self.hide_widget(widget)
         self.to_main_menu()
 
-    #--[Logout]---------------------------------------------------------------
+    #--[Logout]-------------------------------------------------------------------
     def logout(self):
         self.write_data("isUserInCredentialScreen", "False")
         self.write_data("firebaseUsername", "null")
         self.write_data("isFirebaseConnected", "False")
         self.to_main_menu()
 
-    #--[Change Gender]--------------------------------------------------------
+    #--[Change Gender]------------------------------------------------------------
     def change_gender(self):
         if str(db.reference('Users/' + self.read_data("firebaseUsername") + '/Gender').get()) == "0":
             self.show_widget(self.female_profile_pic, 300, 300)
@@ -591,7 +601,7 @@ class AceMath(Tk):
             self.hide_widget(self.female_profile_pic)
             self.write_to_firebase(self.read_data("firebaseUsername"), "Gender", 0)
 
-    #--[Prompt Exit Confirmation While Game is Ongoing]-----------------------
+    #--[Prompt Exit Confirmation While Game is Ongoing]---------------------------
     def prompt_exit(self):
         hideWidgetList = [self.diag_box, self.pre_countdown, self.user_answer, self.rand_int_text, self.account_prompt, self.cancel_game, self.cancel_game_yes, self.cancel_game_no]
         for widget in hideWidgetList:
@@ -599,28 +609,27 @@ class AceMath(Tk):
         self.write_data("isUserInGame", "False")
         self.write_data("isStopwatchPaused", "False")
         self.write_data("isGameStarted", "False")
-        winsound.PlaySound('data/sounds/BGMusic.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
+        winsound.PlaySound(data + "sounds/BGMusic.wav", winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
         self.to_main_menu()
 
-    #--[Cancel Exit Confirmation While Game is Ongoing]-----------------------
+    #--[Cancel Exit Confirmation While Game is Ongoing]---------------------------
     def prompt_exit_cancel(self):
         hideWidgetList = [self.account_prompt, self.cancel_game, self.cancel_game_yes, self.cancel_game_no]
         for widget in hideWidgetList:
             self.hide_widget(widget)
-        self.show_widget(self.rand_int_text, 400, 350)
+        self.show_widget(self.rand_int_text, 370, 350)
         self.show_widget(self.diag_box, 227, 200)
         if self.read_data("isGameStarted") == "True":
             self.show_widget(self.user_answer, 670, 750)
-            self.show_widget(self.pre_countdown, 900, 215)
+            self.show_widget(self.pre_countdown, 870, 215)
             self.user_answer.config(state = 'normal')
         else:
             self.show_widget(self.pre_countdown, 580, 520)
         self.write_data("isStopwatchPaused", "False") 
         self.stopwatch.start()
 
-    #--[Countdown Timer]------------------------------------------------------
+    #--[Countdown Timer]----------------------------------------------------------
     def countdown_timer(self, t):
-        winsound.PlaySound(None, winsound.SND_PURGE)
         self.show_widget(self.pre_countdown, 580, 520)
         while t >= 0:
             if self.read_data("isStopwatchPaused") == "False":
@@ -633,9 +642,9 @@ class AceMath(Tk):
             self.user_answer.config(state = 'normal')
             self.show_widget(self.back_button, 80, 20)
             self.write_data("isGameStarted", "True")
-            winsound.PlaySound('data/sounds/GameStart.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
+            self.gameStartMusic()
 
-    #--[Game Start]-----------------------------------------------------------
+    #--[Game Start]---------------------------------------------------------------
     def start_game(self):
         hideWidgetList = [self.select_difficulty, self.easy_difficulty_button, self.normal_difficulty_button, self.hard_difficulty_button, 
                         self.expert_difficulty_button, self.back_button]
@@ -643,13 +652,14 @@ class AceMath(Tk):
             self.hide_widget(widget)
         self.write_data("isUserInGame", "True")
         self.write_data("currentQuestionNumber", 0)
+        self.show_widget(self.pre_countdown, 890, 215)
         self.countdown_timer(5)
         self.summon_question(int(self.read_data("questionSize")), int(self.read_data("minInteger")), int(self.read_data("maxInteger")))
 
-    #--[Summon Question]------------------------------------------------------
+    #--[Summon Question]----------------------------------------------------------
     def summon_question(self, questionSize, minInteger, maxInteger):
         if int(self.read_data("currentQuestionNumber")) <= questionSize:
-            showWidgetList = [[self.user_answer, 670, 750], [self.rand_int_text, 400, 350], [self.pre_countdown, 900, 215]]
+            showWidgetList = [[self.user_answer, 670, 750], [self.rand_int_text, 370, 350], [self.pre_countdown, 870, 215]]
             for widget in range(len(showWidgetList)):
                 self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
             self.user_answer.focus()
@@ -664,7 +674,7 @@ class AceMath(Tk):
             self.show_widget(self.finish_game, 840, 770)
             self.show_widget(self.pre_countdown, 420, 450)
             self.stopwatch.stop()
-            winsound.PlaySound('data/sounds/GameFinish.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
+            self.gameFinishMusic()
             self.write_data("currentQuestionNumber", 0)
             self.write_data("isUserInGame", "False")
             self.write_data("isGameStarted", "False")
@@ -672,14 +682,14 @@ class AceMath(Tk):
             self.user_answer.delete(0, 'end')
             self.submit_score()
 
-    #--[Check Answer]---------------------------------------------------------
+    #--[Check Answer]-------------------------------------------------------------
     def check_answer(self, event):
         if self.user_answer.get() == self.read_data("answer"):
             self.write_data("currentQuestionNumber", int(self.read_data("currentQuestionNumber")) + 1)
             self.user_answer.delete(0, 'end')
             self.summon_question(int(self.read_data("questionSize")), int(self.read_data("minInteger")), int(self.read_data("maxInteger")))
 
-    #--[Submit Score to Firebase Database]------------------------------------
+    #--[Submit Score to Firebase Database]----------------------------------------
     def submit_score(self):
         if self.read_data("isFirebaseConnected") == "True":
             times_played = db.reference('Users/' + self.read_data("firebaseUsername") + '/TimesPlayed/' + self.read_data("selectedDifficulty"))
@@ -695,15 +705,15 @@ class AceMath(Tk):
                     self.read_data("firebaseUsername") + '/FastestTime/' + self.read_data("selectedDifficulty") + 'Value': self.stopwatch.duration
                 })
 
-    #--[Result Affirm]--------------------------------------------------------
+    #--[Result Affirm]------------------------------------------------------------
     def ok_result(self):
         hideWidgetList = [self.diag_box, self.pre_countdown, self.finish_game]
         for widget in hideWidgetList:
             self.hide_widget(widget)
-        winsound.PlaySound('data/sounds/BGMusic.wav', winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
+        winsound.PlaySound(data + "sounds/BGMusic.wav", winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
         self.to_main_menu()
 
-    #--[EXIT PROGRAM Confirmation Dialog]-------------------------------------
+    #--[EXIT PROGRAM Confirmation Dialog]-----------------------------------------
     def close_confirmation(self, event):
         hideWidgetList = [self.account_prompt, self.no_sync, self.ok_button]
         for widget in hideWidgetList:
@@ -715,17 +725,17 @@ class AceMath(Tk):
         self.exit_yes_button.lift()
         self.exit_no_button.lift()
 
-    #--[Cancel Exit Program Event]--------------------------------------------
+    #--[Cancel Exit Program Event]------------------------------------------------
     def cancel(self):
         self.hide_widget(self.exit_confirm)
         self.hide_widget(self.exit_yes_button)
         self.hide_widget(self.exit_no_button)
 
-    #--[Exit Program Event]---------------------------------------------------
+    #--[Exit Program Event]-------------------------------------------------------
     def close(self):
         self.destroy()
     
-#--[Initialize Stopwatch]-------------------------------------------------
+#--[Initialize Stopwatch]---------------------------------------------------------
 class Stopwatch:
     def __init__(self):
         self._start = time.perf_counter()

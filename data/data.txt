@@ -1,11 +1,11 @@
 isFirebaseConnected = False
 firebaseUsername = null
 isUserInCredentialScreen = False
-questionSize = 19
+questionSize = 0
 isGameStarted = False
 isStopwatchPaused = False
 isUserInGame = False
 currentQuestionNumber = 0
-answer = 13
+answer = 0
 minInteger = 0
-maxInteger = 9
+maxInteger = 0
