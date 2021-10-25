@@ -1,6 +1,7 @@
 isFirebaseConnected = False
 firebaseUsername = null
 isUserInCredentialScreen = False
+selectedDifficulty = null
 questionSize = 0
 isGameStarted = False
 isStopwatchPaused = False
