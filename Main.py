@@ -730,7 +730,6 @@ class AceMath(Tk):
             self.hide_widget(widget)
         self.write_data("isUserInGame", "True")
         self.write_data("currentQuestionNumber", 0)
-        self.show_widget(self.pre_countdown, 890, 215)
         self.countdown_timer(5)
         self.summon_question(int(self.read_data("questionSize")), int(self.read_data("minInteger")), int(self.read_data("maxInteger")))
 
@@ -750,16 +749,24 @@ class AceMath(Tk):
             for widget in hideWidgetList:
                 self.hide_widget(widget)
             self.show_widget(self.finish_game, 840, 770)
-            self.show_widget(self.pre_countdown, 400, 450)
             self.stopwatch.stop()
             self.gameFinishMusic()
-            self.write_data("currentQuestionNumber", 0)
-            self.write_data("isUserInGame", "False")
+            self.write_data("questionSize", 0)
             self.write_data("isGameStarted", "False")
-            self.pre_countdown.config(text = f"Your time is {str(self.stopwatch)}\nKeep on trying!")
+            self.write_data("isUserInGame", "False")
+            self.write_data("currentQuestionNumber", 0)
+            self.write_data("answer", 0)
+            self.write_data("minInteger", 0)
+            self.write_data("maxInteger", 0)
             self.user_answer.delete(0, "end")
-            self.submit_score()
-
+            if self.read_data("isFirebaseConnected") == "True":
+                self.show_widget(self.pre_countdown, 420, 450)
+                self.submit_score() 
+            else:
+                self.show_widget(self.pre_countdown, 500, 450)
+                self.pre_countdown.config(text = f"Your time is {str(self.stopwatch)}\nSign in to save your record!")
+            self.write_data("selectedDifficulty", "null")
+            
     #--[Check Answer]-------------------------------------------------------------
     def check_answer(self, event):
         if self.user_answer.get() == self.read_data("answer"):
@@ -769,19 +776,20 @@ class AceMath(Tk):
 
     #--[Submit Score to Firebase Database]----------------------------------------
     def submit_score(self):
-        if self.read_data("isFirebaseConnected") == "True":
-            timesPlayed = db.reference("Users/" + self.read_data("firebaseUsername") + "/TimesPlayed/" + self.read_data("selectedDifficulty")).get()
-            timesPlayed += 1
-            user = db.reference("Users")
-            user.update({self.read_data("firebaseUsername") + "/TimesPlayed/" + self.read_data("selectedDifficulty"): timesPlayed,})
-            previousBestTime = db.reference("Users/" + self.read_data("firebaseUsername") + "/FastestTime/" + self.read_data("selectedDifficulty") + "Value")
-            if self.stopwatch.duration < previousBestTime.get():
-                self.pre_countdown.config(text = f"Congratulations!\nYour time is {str(self.stopwatch)}\nNew Personal Record!", fg = "green")
-                user.update({
-                    self.read_data("firebaseUsername") + "/FastestTime/" + self.read_data("selectedDifficulty"): str(self.stopwatch),
-                    self.read_data("firebaseUsername") + "/FastestTime/" + self.read_data("selectedDifficulty") + "Value": self.stopwatch.duration
-                })
-        self.stopwatch.reset()
+        timesPlayed = db.reference("Users/" + self.read_data("firebaseUsername") + "/TimesPlayed/" + self.read_data("selectedDifficulty")).get()
+        timesPlayed += 1
+        user = db.reference("Users")
+        user.update({self.read_data("firebaseUsername") + "/TimesPlayed/" + self.read_data("selectedDifficulty"): timesPlayed,})
+        previousBestTime = db.reference("Users/" + self.read_data("firebaseUsername") + "/FastestTime/" + self.read_data("selectedDifficulty") + "Value")
+        if self.stopwatch.duration < previousBestTime.get():
+            self.pre_countdown.config(text = f"Congratulations!\nYour time is {str(self.stopwatch)}\nNew Personal Record!", fg = "green")
+            user.update({
+                self.read_data("firebaseUsername") + "/FastestTime/" + self.read_data("selectedDifficulty"): str(self.stopwatch),
+                self.read_data("firebaseUsername") + "/FastestTime/" + self.read_data("selectedDifficulty") + "Value": self.stopwatch.duration
+            })
+        else:
+            self.show_widget(self.pre_countdown, 390, 450)
+            self.pre_countdown.config(text = f"Your time is {str(self.stopwatch)}\nKeep on trying!")
 
     #--[Result Affirm]------------------------------------------------------------
     def ok_result(self):
