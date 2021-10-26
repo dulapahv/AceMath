@@ -417,12 +417,12 @@ class AceMath(Tk):
             self.user_answer.config(state = "disabled")
             self.hide_widget(self.diag_box)
         else:
-            hideWidgetList = [self.go_to_sync, self.sync_prompt, self.offline_button, self.back_button, self.account_prompt, self.account_text, self.offline_button, 
-                            self.create_button, self.login_button, self.logout_prompt, self.logout_button, self.cancel_logout_button, self.diag_box, self.profile_name, 
-                            self.profile_stat, self.profile_stat_game, self.male_profile_pic, self.female_profile_pic, self.change_gender_button, self.select_difficulty, 
-                            self.easy_difficulty_button, self.normal_difficulty_button, self.hard_difficulty_button, self.expert_difficulty_button, self.easy_small_button,
-                            self.normal_small_button, self.hard_small_button, self.expert_small_button, self.easy_leaderboard, self.normal_leaderboard, self.hard_leaderboard,
-                            self.expert_leaderboard, self.leaderboardName, self.leaderboardTime]
+            hideWidgetList = [self.go_to_sync, self.sync_prompt, self.offline_button, self.back_button, self.account_prompt, self.account_text, 
+                            self.offline_button, self.create_button, self.login_button, self.logout_prompt, self.logout_button, self.cancel_logout_button, 
+                            self.diag_box, self.profile_name, self.profile_stat, self.profile_stat_game, self.male_profile_pic, self.female_profile_pic, 
+                            self.change_gender_button, self.select_difficulty, self.easy_difficulty_button, self.normal_difficulty_button, self.hard_difficulty_button, 
+                            self.expert_difficulty_button, self.easy_small_button, self.normal_small_button, self.hard_small_button, self.expert_small_button, 
+                            self.easy_leaderboard, self.normal_leaderboard, self.hard_leaderboard, self.expert_leaderboard, self.leaderboardName, self.leaderboardTime]
             for widget in hideWidgetList:
                 self.hide_widget(widget)
             showWidgetList = [[self.play_button, 80, 292], [self.sync_button, 80, 425], [self.profile_button, 80, 558], [self.leaderboard_button, 80, 690], 
@@ -504,8 +504,8 @@ class AceMath(Tk):
                 self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
         else:
             self.out_main_menu()
-            showWidgetList = [[self.diag_box, 227, 200], [self.profile_name, 1000, 250], [self.profile_stat, 1000, 400], [self.profile_stat_game, 1245, 400], 
-                            [self.change_gender_button, 248, 840]]
+            showWidgetList = [[self.diag_box, 227, 200], [self.profile_name, 1000, 250], [self.profile_stat, 1000, 400], 
+                            [self.profile_stat_game, 1245, 400], [self.change_gender_button, 248, 840]]
             for widget in range(len(showWidgetList)):
                 self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
             length = 20
@@ -533,8 +533,8 @@ class AceMath(Tk):
     def leaderboard(self):
         self.out_main_menu()
         self.easy_board()
-        showWidgetList = [[self.easy_small_button, 525, 44], [self.normal_small_button, 735, 44], [self.hard_small_button, 945, 44], [self.expert_small_button, 1155, 44], 
-                            [self.easy_leaderboard, 525, 130]]
+        showWidgetList = [[self.easy_small_button, 525, 44], [self.normal_small_button, 735, 44], [self.hard_small_button, 945, 44], 
+                        [self.expert_small_button, 1155, 44], [self.easy_leaderboard, 525, 130]]
         for widget in range(len(showWidgetList)):
             self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
     
@@ -617,7 +617,8 @@ class AceMath(Tk):
             hideWidgetList = [self.offline_button, self.create_button, self.account_text, self.back_button]
             for widget in hideWidgetList:
                 self.hide_widget(widget)
-            showWidgetList = [[self.login_button, 1188, 683], [self.login_auth, 590, 520], [self.back_auth_button, 520, 400], [self.username, 820, 520], [self.password, 820, 585]]
+            showWidgetList = [[self.login_button, 1188, 683], [self.login_auth, 590, 520], [self.back_auth_button, 520, 400], 
+                            [self.username, 820, 520], [self.password, 820, 585]]
             for widget in range(len(showWidgetList)):
                 self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
             self.write_data("isUserInCredentialScreen", "True")
@@ -673,7 +674,8 @@ class AceMath(Tk):
 
     #--[Prompt Exit Confirmation While Game is Ongoing]---------------------------
     def prompt_exit(self):
-        hideWidgetList = [self.diag_box, self.pre_countdown, self.user_answer, self.rand_int_text, self.account_prompt, self.cancel_game, self.cancel_game_yes, self.cancel_game_no]
+        hideWidgetList = [self.diag_box, self.pre_countdown, self.user_answer, self.rand_int_text, self.account_prompt, self.cancel_game, 
+                        self.cancel_game_yes, self.cancel_game_no]
         for widget in hideWidgetList:
             self.hide_widget(widget)
         winsound.PlaySound(data + "sounds/BGMusic.wav", winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
@@ -741,13 +743,6 @@ class AceMath(Tk):
             self.show_widget(self.finish_game, 840, 770)
             self.stopwatch.stop()
             self.gameFinishMusic()
-            self.write_data("questionSize", 0)
-            self.write_data("isGameStarted", "False")
-            self.write_data("isUserInGame", "False")
-            self.write_data("currentQuestionNumber", 0)
-            self.write_data("answer", 0)
-            self.write_data("minInteger", 0)
-            self.write_data("maxInteger", 0)
             self.user_answer.delete(0, "end")
             if self.read_data("isFirebaseConnected") == "True":
                 self.show_widget(self.pre_countdown, 420, 450)
@@ -755,7 +750,7 @@ class AceMath(Tk):
             else:
                 self.show_widget(self.pre_countdown, 500, 450)
                 self.pre_countdown.config(text = f"Your time is {str(self.stopwatch)}\nSign in to save your record!")
-            self.write_data("selectedDifficulty", "null")
+            self.reinitialize()
             
     #--[Check Answer]-------------------------------------------------------------
     def check_answer(self, event):
