@@ -41,10 +41,15 @@ class AceMath(Tk):
         self.bind("<F11>", self.fullscreen)
         self.bind("<Escape>", self.close_confirmation)
         self.write_data("isUserInCredentialScreen", "False")
+        self.write_data("selectedDifficulty", "null")
+        self.write_data("questionSize", 0)
         self.write_data("isGameStarted", "False")
         self.write_data("isStopwatchPaused", "False")
         self.write_data("isUserInGame", "False")
         self.write_data("currentQuestionNumber", 0)
+        self.write_data("answer", 0)
+        self.write_data("minInteger", 0)
+        self.write_data("maxInteger", 0)
         self.stopwatch = Stopwatch() # Create stopwatch object
         self.BGMusic = lambda: winsound.PlaySound(data + "sounds/BGMusic.wav", winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
         self.gameFinishMusic = lambda: winsound.PlaySound(data + "sounds/GameFinish.wav", winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
@@ -556,8 +561,7 @@ class AceMath(Tk):
             self.hide_widget(widget)
         self.show_widget(self.easy_leaderboard, 525, 130)
         nameList, timeList = self.getLeaderboard("Easy")
-        self.display_leaderboard(nameList, timeList)
-        
+        self.display_leaderboard(nameList, timeList) 
     
     def normal_board(self):
         hideWidgetList = [self.easy_leaderboard, self.hard_leaderboard, self.expert_leaderboard]
@@ -566,7 +570,6 @@ class AceMath(Tk):
         self.show_widget(self.normal_leaderboard, 525, 130)
         nameList, timeList = self.getLeaderboard("Normal")
         self.display_leaderboard(nameList, timeList)
-
     
     def hard_board(self):
         hideWidgetList = [self.easy_leaderboard, self.normal_leaderboard, self.expert_leaderboard]
@@ -575,7 +578,6 @@ class AceMath(Tk):
         self.show_widget(self.hard_leaderboard, 525, 130)
         nameList, timeList = self.getLeaderboard("Hard")
         self.display_leaderboard(nameList, timeList)
-
     
     def expert_board(self):
         hideWidgetList = [self.easy_leaderboard, self.normal_leaderboard, self.hard_leaderboard]
@@ -584,7 +586,6 @@ class AceMath(Tk):
         self.show_widget(self.expert_leaderboard, 525, 130)
         nameList, timeList = self.getLeaderboard("Expert")
         self.display_leaderboard(nameList, timeList)
-
 
     #--[ABOUT Page]---------------------------------------------------------------
     def about(self):
@@ -685,14 +686,15 @@ class AceMath(Tk):
         for widget in hideWidgetList:
             self.hide_widget(widget)
         self.write_data("selectedDifficulty", "null")
-        self.write_data("isUserInGame", "False")
-        self.write_data("isStopwatchPaused", "False")
+        self.write_data("questionSize", 0)
         self.write_data("isGameStarted", "False")
+        self.write_data("isStopwatchPaused", "False")
+        self.write_data("isUserInGame", "False")
         self.write_data("currentQuestionNumber", 0)
         self.write_data("answer", 0)
         self.write_data("minInteger", 0)
         self.write_data("maxInteger", 0)
-        self.write_data("questionSize", 0)
+        
         winsound.PlaySound(data + "sounds/BGMusic.wav", winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
         self.to_main_menu()
 
@@ -825,6 +827,16 @@ class AceMath(Tk):
 
     #--[Exit Program Event]-------------------------------------------------------
     def close(self):
+        self.write_data("isUserInCredentialScreen", "False")
+        self.write_data("selectedDifficulty", "null")
+        self.write_data("questionSize", 0)
+        self.write_data("isGameStarted", "False")
+        self.write_data("isStopwatchPaused", "False")
+        self.write_data("isUserInGame", "False")
+        self.write_data("currentQuestionNumber", 0)
+        self.write_data("answer", 0)
+        self.write_data("minInteger", 0)
+        self.write_data("maxInteger", 0)
         self.destroy()
     
 #--[Initialize Stopwatch]---------------------------------------------------------
