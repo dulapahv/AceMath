@@ -40,16 +40,7 @@ class AceMath(Tk):
         self.wm_iconbitmap(data + "images/AceMath.ico")
         self.bind("<F11>", self.fullscreen)
         self.bind("<Escape>", self.close_confirmation)
-        self.write_data("isUserInCredentialScreen", "False")
-        self.write_data("selectedDifficulty", "null")
-        self.write_data("questionSize", 0)
-        self.write_data("isGameStarted", "False")
-        self.write_data("isStopwatchPaused", "False")
-        self.write_data("isUserInGame", "False")
-        self.write_data("currentQuestionNumber", 0)
-        self.write_data("answer", 0)
-        self.write_data("minInteger", 0)
-        self.write_data("maxInteger", 0)
+        self.reinitialize()
         self.stopwatch = Stopwatch() # Create stopwatch object
         self.BGMusic = lambda: winsound.PlaySound(data + "sounds/BGMusic.wav", winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
         self.gameFinishMusic = lambda: winsound.PlaySound(data + "sounds/GameFinish.wav", winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
@@ -685,17 +676,8 @@ class AceMath(Tk):
         hideWidgetList = [self.diag_box, self.pre_countdown, self.user_answer, self.rand_int_text, self.account_prompt, self.cancel_game, self.cancel_game_yes, self.cancel_game_no]
         for widget in hideWidgetList:
             self.hide_widget(widget)
-        self.write_data("selectedDifficulty", "null")
-        self.write_data("questionSize", 0)
-        self.write_data("isGameStarted", "False")
-        self.write_data("isStopwatchPaused", "False")
-        self.write_data("isUserInGame", "False")
-        self.write_data("currentQuestionNumber", 0)
-        self.write_data("answer", 0)
-        self.write_data("minInteger", 0)
-        self.write_data("maxInteger", 0)
-        
         winsound.PlaySound(data + "sounds/BGMusic.wav", winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
+        self.reinitialize()
         self.to_main_menu()
 
     #--[Cancel Exit Confirmation While Game is Ongoing]---------------------------
@@ -806,6 +788,19 @@ class AceMath(Tk):
             self.hide_widget(widget)
         winsound.PlaySound(data + "sounds/BGMusic.wav", winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
         self.to_main_menu()
+    
+    #--[Reinitialize data.txt]----------------------------------------------------
+    def reinitialize(self):
+        self.write_data("isUserInCredentialScreen", "False")
+        self.write_data("selectedDifficulty", "null")
+        self.write_data("questionSize", 0)
+        self.write_data("isGameStarted", "False")
+        self.write_data("isStopwatchPaused", "False")
+        self.write_data("isUserInGame", "False")
+        self.write_data("currentQuestionNumber", 0)
+        self.write_data("answer", 0)
+        self.write_data("minInteger", 0)
+        self.write_data("maxInteger", 0)
 
     #--[EXIT PROGRAM Confirmation Dialog]-----------------------------------------
     def close_confirmation(self, event):
@@ -827,16 +822,7 @@ class AceMath(Tk):
 
     #--[Exit Program Event]-------------------------------------------------------
     def close(self):
-        self.write_data("isUserInCredentialScreen", "False")
-        self.write_data("selectedDifficulty", "null")
-        self.write_data("questionSize", 0)
-        self.write_data("isGameStarted", "False")
-        self.write_data("isStopwatchPaused", "False")
-        self.write_data("isUserInGame", "False")
-        self.write_data("currentQuestionNumber", 0)
-        self.write_data("answer", 0)
-        self.write_data("minInteger", 0)
-        self.write_data("maxInteger", 0)
+        self.reinitialize()
         self.destroy()
     
 #--[Initialize Stopwatch]---------------------------------------------------------
