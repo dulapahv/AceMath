@@ -6,22 +6,25 @@ An individual project for Introduction to Computers and Programming, KMITL Softw
 
 > Created by **Dulapah Vibulsanti (64011388)**
 
-Download the game at `AceMath_by_n0miya.zip` or [gdrive](https://drive.google.com/file/d/18cR53-hUbM7ec3JAbiwLo_uEHLXHPubf/view?usp=sharing)
-**and compile `Main.py`**
+To run a program, run these commands in the terminal :
+ - `pip install Pillow`
+ - `pip install firebase-admin`
 
-You **MUST** run these commands in the terminal!
- - pip install Pillow
- - pip install firebase-admin
+Then simply compile `Main.py`!
+
+**Download Here** 
+- [gdrive](https://drive.google.com/file/d/18cR53-hUbM7ec3JAbiwLo_uEHLXHPubf/view?usp=sharing)
+- [Github](https://github.com/DulapahV/AceMath/blob/main/AceMath.zip)
 
 This README is separated into 2 parts:
  - [Project Description](#project-description)
-	 - [Main Menu](#main-menu)
+ - [Demo](#demo)
+ 	 - [Main Menu](#main-menu)
 	 - [Register Account](#register-account)
 	 - [Login](#login)
 	 - [Play](#play)
 	 - [Profile](#profile)
 	 - [Leaderboard](#leaderboard)
- - [Demo](#demo)
 
 # Project Description
 AceMath is an online speed mathematics game written in Python.
