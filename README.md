@@ -1,16 +1,102 @@
+
+
+
 # AceMath
 An individual project for Introduction to Computers and Programming, KMITL Software Engineering, Year 1, Semester 1
 
-Created by **Dulapah Vibulsanti (64011388)**
+> Created by **Dulapah Vibulsanti (64011388)**
+
+Download the game at `AceMath_by_n0miya.zip` or [gdrive](https://drive.google.com/file/d/18cR53-hUbM7ec3JAbiwLo_uEHLXHPubf/view?usp=sharing)
+**and compile `Main.py`**
+
+You **MUST** run these commands in the terminal!
+ - pip install Pillow
+ - pip install firebase-admin
+
+This README is separated into 2 parts:
+ - [Project Description](#project-description)
+	 - [Main Menu](#main-menu)
+	 - [Register Account](#register-account)
+	 - [Login](#login)
+	 - [Play](#play)
+	 - [Profile](#profile)
+	 - [Leaderboard](#leaderboard)
+ - [Demo](#demo)
 
 # Project Description
-Immerse yourself into a challenging world of mathematics. Solve the problems as fast as you can to earn yourself a new record. 4 Difficulties are available for people who seek even more challenges with up to 40 questions in a single game. Play the game anywhere and anytime you want with the sync features, allowing you to earn a new record anywhere, anytime.
+AceMath is an online speed mathematics game written in Python.
+The goal is to solve math problems as fast as you can while also competing with other people around the world!
 
-Download the game at *AceMath_by_n0miya.zip* or https://drive.google.com/file/d/1rJ1poAiQxPKJaZfgqTON_wMBUg3KJAa6/view?usp=sharing
-(Latest update: 9/9/2021)
+The key features are:
+ 1. 4 Difficulties
+	 - Easy (1 digit integer x 20 questions)
+	 - Normal (2 digits integer x 20 questions)
+	 - Hard (3 digits integer x 20 questions)
+	 - Expert (4 digits integer x 20 questions)
+ 2. Online account synchronization with built-in register/login account feature
+ 3. Online leaderboard system with separated difficulty
+ 4. Users can log in to view their profile stats and sync their progress anywhere/anytime in the world
+ 5. Can also be played offline!
 
-You **MUST** run these commands in terminal first!
-1. pip install Pillow
-2. pip install firebase-admin
+# Demo
+### Main Menu
+![image](https://user-images.githubusercontent.com/71577909/138806837-186e85a3-fde0-4e70-b5ba-1d181ea52b34.png)
 
-To launch the game, simply compile *Main.py*. You can also go to getting_started-AceMath.pdf and documentation-AceMath.pdf to learn more about this game!
+### Register Account
+Select `Sync`
+![image](https://user-images.githubusercontent.com/71577909/138806837-186e85a3-fde0-4e70-b5ba-1d181ea52b34.png)
+
+Select `Create`
+![image](https://user-images.githubusercontent.com/71577909/138807760-d7f48b15-7c08-43fd-8cac-e313fe58a1c2.png)
+
+Enter your desired Username and Password then click `Create`
+![image](https://user-images.githubusercontent.com/71577909/138807898-d5b9f498-1dfc-4cac-aa87-205bf46aef5b.png)
+
+If successful, a green message will show up
+![image](https://user-images.githubusercontent.com/71577909/138808081-eb15f9cf-0289-4500-8b80-9d1ac31294e1.png)
+
+New user will be created in the game's online database
+
+![image](https://user-images.githubusercontent.com/71577909/138812340-d91742ef-d4bf-4cf1-80db-79d18bc695e3.png)
+
+### Login
+Select `Login`
+![image](https://user-images.githubusercontent.com/71577909/138807760-d7f48b15-7c08-43fd-8cac-e313fe58a1c2.png)
+
+Enter your credentials then press `Login`
+![image](https://user-images.githubusercontent.com/71577909/138808168-4b32fdae-05b3-4f62-9a58-6c95b147683e.png)
+
+If successful, you will see this welcome message
+![image](https://user-images.githubusercontent.com/71577909/138808251-b749391b-c36c-40d7-a278-135daf1d313e.png)
+
+### Play
+Select `Play`
+![image](https://user-images.githubusercontent.com/71577909/138806837-186e85a3-fde0-4e70-b5ba-1d181ea52b34.png)
+
+Select your desired difficulty
+![image](https://user-images.githubusercontent.com/71577909/138808402-a220aa37-e3dc-4fca-a035-4a2d721b90a8.png)
+
+There will be 5 seconds countdown before the game will start, get ready!
+![image](https://user-images.githubusercontent.com/71577909/138808460-79bf1045-5c2e-49ac-9c79-2e4626ae2571.png)
+
+Start typing your answer and press enter (the answer field is automatically focussed). If your answer is correct, you will advance to the next question. The top right number shows what question you are working on.
+![image](https://user-images.githubusercontent.com/71577909/138808473-02644450-1950-41d1-b8ab-6e502a1aac6e.png)
+
+Once you finished all questions, your performance stat will show up
+![image](https://user-images.githubusercontent.com/71577909/138808840-e7472b2c-71cc-46a1-91c0-ba08cc529ab6.png)
+
+### Profile
+Select `Profile`
+![image](https://user-images.githubusercontent.com/71577909/138806837-186e85a3-fde0-4e70-b5ba-1d181ea52b34.png)
+
+Here, you can see all your stats including the amount of time you played in all/each difficulty as well as the fastest time in each difficulty. You can also change gender by clicking on the bottom left icon!
+![image](https://user-images.githubusercontent.com/71577909/138808900-c0380f16-e5ec-4481-838f-56d717f45a19.png)
+
+### Leaderboard
+Select `Leaderboard`
+![image](https://user-images.githubusercontent.com/71577909/138806837-186e85a3-fde0-4e70-b5ba-1d181ea52b34.png)
+
+Top-10 users with their fastest time will appear. You can also select the difficulty at the top to change the category.
+![image](https://user-images.githubusercontent.com/71577909/138809250-20a37684-1ab3-4e26-87b0-f1ed27078575.png)
+
+*Now, you are on your way to becoming an AceMath champion!*
