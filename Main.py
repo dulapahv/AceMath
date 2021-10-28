@@ -16,15 +16,15 @@ from firebase_admin import initialize_app, credentials, db
 from PIL import ImageTk, Image
  
 #--[Program Data Path]------------------------------------------------------------
-# The default path is "data/" (including slash and quotes)
+# The default path is "data"
 # Inside the specified path must exist a folder named "sounds" and "images" (i.e. data/sounds and data/images)
 # Inside the specified path must also exist a Firebase Service Account Key and data.txt (i.e. data/serviceAccountKey.json and data/data.txt)
-data = "data/"
+dataPath = "data"
 
 #--[Firebase Database Credential and Path]---------------------------------------
 # The Service Account Key is stored in the default data path (i.e. data/serviceAccountKey.json)
 # Internet connection is required to authenticate and access database
-cred = credentials.Certificate(data + "serviceAccountKey.json")
+cred = credentials.Certificate(f"{dataPath}/serviceAccountKey.json")
 initialize_app(cred, {"databaseURL": "https://acemath-n0miya-default-rtdb.asia-southeast1.firebasedatabase.app/"})
 
 class AceMath(Tk):
@@ -37,15 +37,15 @@ class AceMath(Tk):
         self.title("AcΣMαth")
         self.geometry("1920x1080")
         self.attributes("-fullscreen", True)
-        self.wm_iconbitmap(data + "images/AceMath.ico")
+        self.wm_iconbitmap(f"{dataPath}/images/AceMath.ico")
         self.bind("<F11>", self.fullscreen)
         self.bind("<Escape>", self.close_confirmation)
         self.reinitialize()
         self.stopwatch = Stopwatch() # Create stopwatch object
-        self.BGMusic = lambda: winsound.PlaySound(data + "sounds/BGMusic.wav", winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
-        self.gameFinishMusic = lambda: winsound.PlaySound(data + "sounds/GameFinish.wav", winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
-        self.gameStartMusic = lambda: winsound.PlaySound(data + "sounds/GameStart.wav", winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
-        self.DifficultySelectedMusic = lambda: winsound.PlaySound(data + "sounds/DifficultySelected.wav", winsound.SND_FILENAME)
+        self.BGMusic = lambda: winsound.PlaySound(f"{dataPath}/sounds/BGMusic.wav", winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
+        self.gameFinishMusic = lambda: winsound.PlaySound(f"{dataPath}/sounds/GameFinish.wav", winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
+        self.gameStartMusic = lambda: winsound.PlaySound(f"{dataPath}/sounds/GameStart.wav", winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
+        self.DifficultySelectedMusic = lambda: winsound.PlaySound(f"{dataPath}/sounds/DifficultySelected.wav", winsound.SND_FILENAME)
         self.BGMusic()
 
         #-------------------------------------------------------------------------
@@ -54,92 +54,92 @@ class AceMath(Tk):
         #--[Background Image]-----------------------------------------------------
         self.BGFullCanvas = Canvas(self, width = 1920, height = 1080)
         self.BGFullCanvas.pack()
-        self.BGFull = ImageTk.PhotoImage(Image.open(data + "images/BGFull.jpg"))
+        self.BGFull = ImageTk.PhotoImage(Image.open(f"{dataPath}/images/BGFull.jpg"))
         self.BGFullCanvas.create_image(0, 0, anchor = "nw", image = self.BGFull)
 
         self.BGCanvas = Canvas(self, width = 1920, height = 1080)
         self.BGCanvas.pack()
-        self.BG = ImageTk.PhotoImage(Image.open(data + "images/BG.jpg"))
+        self.BG = ImageTk.PhotoImage(Image.open(f"{dataPath}/images/BG.jpg"))
         self.BGCanvas.create_image(0, 0, anchor = "nw", image = self.BG)
 
         #--[Play Button]----------------------------------------------------------
-        self.PlayButtonBG = PhotoImage(file = data + "images/Play.png")
+        self.PlayButtonBG = PhotoImage(file = f"{dataPath}/images/Play.png")
         self.play_button = Button(self, image = self.PlayButtonBG, borderwidth = 0, command = self.play)
         self.play_button.place(x = 80, y = 292)
 
         #--[Sync Button]----------------------------------------------------------
-        self.SyncButtonBG = PhotoImage(file = data + "images/Sync.png")
+        self.SyncButtonBG = PhotoImage(file = f"{dataPath}/images/Sync.png")
         self.sync_button = Button(self, image = self.SyncButtonBG, borderwidth = 0, command = self.sync)
         self.sync_button.place(x = 80, y = 425)
 
         #--[Profile Button]-------------------------------------------------------
-        self.ProfileButtonBG = PhotoImage(file = data + "images/Profile.png")
+        self.ProfileButtonBG = PhotoImage(file = f"{dataPath}/images/Profile.png")
         self.profile_button = Button(self, image = self.ProfileButtonBG, borderwidth = 0, command = self.profile)
         self.profile_button.place(x = 80, y = 558)
 
         #--[Leaderboard Button]-------------------------------------------------------
-        self.LeaderboardButtonBG = PhotoImage(file = data + "images/Leaderboard.png")
+        self.LeaderboardButtonBG = PhotoImage(file = f"{dataPath}/images/Leaderboard.png")
         self.leaderboard_button = Button(self, image = self.LeaderboardButtonBG, borderwidth = 0, command = self.leaderboard)
         self.leaderboard_button.place(x = 80, y = 690)
 
         #--[About Button]---------------------------------------------------------
-        self.AboutButtonBG = PhotoImage(file = data + "images/About.png")
+        self.AboutButtonBG = PhotoImage(file = f"{dataPath}/images/About.png")
         self.about_button = Button(self, image = self.AboutButtonBG, borderwidth = 0, command = self.about)
         self.about_button.place(x = 80, y = 810)
 
         #--[Exit Button]----------------------------------------------------------
-        self.ExitButtonBG = PhotoImage(file = data + "images/Exit.png")
+        self.ExitButtonBG = PhotoImage(file = f"{dataPath}/images/Exit.png")
         self.exit_button = Button(self, image = self.ExitButtonBG, borderwidth = 0)
         self.exit_button.place(x = 80, y = 923)
         self.exit_button.bind("<Button-1>", self.close_confirmation)
 
         #--[Back Button]----------------------------------------------------------
-        self.BackButtonBG = PhotoImage(file=data + "images/Back.png")
+        self.BackButtonBG = PhotoImage(file = f"{dataPath}/images/Back.png")
         self.back_button = Button(self, image = self.BackButtonBG, borderwidth = 0, command = self.to_main_menu)
 
         #--[About Description]----------------------------------------------------
         self.AboutCanvas = Canvas(self, width = 1920, height = 1080)
         self.AboutCanvas.pack()
-        self.About = ImageTk.PhotoImage(Image.open(data + "images/AboutMe.jpg"))
+        self.About = ImageTk.PhotoImage(Image.open(f"{dataPath}/images/AboutMe.jpg"))
         self.AboutCanvas.create_image(0, 0, anchor = "nw", image = self.About)
 
         #--[Exit Confirmation Dialog]---------------------------------------------
-        self.ExitConfirmDiagBG = Image.open(data + "images/ExitDiag.png")
+        self.ExitConfirmDiagBG = Image.open(f"{dataPath}/images/ExitDiag.png")
         self.ExitConfirmBG = ImageTk.PhotoImage(self.ExitConfirmDiagBG)
         self.exit_confirm = Label(image = self.ExitConfirmBG)
 
-        self.ExitYesButtonBG = PhotoImage(file = data + "images/Yes.png")
+        self.ExitYesButtonBG = PhotoImage(file = f"{dataPath}/images/Yes.png")
         self.exit_yes_button = Button(self, image = self.ExitYesButtonBG, borderwidth = 0, command = self.close)
 
-        self.ExitNoButtonBG = PhotoImage(file = data + "images/No.png")
+        self.ExitNoButtonBG = PhotoImage(file = f"{dataPath}/images/No.png")
         self.exit_no_button = Button(self, image = self.ExitNoButtonBG, borderwidth = 0, command = self.cancel)
 
         #--[Not Logged in Dialog]-------------------------------------------------
-        self.AccountPromptDiagBG = Image.open(data + "images/AccountPrompt.png")
+        self.AccountPromptDiagBG = Image.open(f"{dataPath}/images/AccountPrompt.png")
         self.AccountPromptBG = ImageTk.PhotoImage(self.AccountPromptDiagBG)
         self.account_prompt = Label(image = self.AccountPromptBG)
 
-        self.AccountPromptDiagText = Image.open(data + "images/AccountPromptText.png")
+        self.AccountPromptDiagText = Image.open(f"{dataPath}/images/AccountPromptText.png")
         self.AccountPromptText = ImageTk.PhotoImage(self.AccountPromptDiagText)
         self.account_text = Label(image = self.AccountPromptText, borderwidth = 0)
 
-        self.OfflineButtonBG = PhotoImage(file = data + "images/Offline.png")
+        self.OfflineButtonBG = PhotoImage(file = f"{dataPath}/images/Offline.png")
         self.offline_button = Button(self, image = self.OfflineButtonBG, borderwidth = 0, command = self.play_offline)
 
-        self.CreateButtonBG = PhotoImage(file = data + "images/Create.png")
+        self.CreateButtonBG = PhotoImage(file = f"{dataPath}/images/Create.png")
         self.create_button = Button(self, image = self.CreateButtonBG, borderwidth = 0, command = self.create_account)
 
-        self.LoginButtonBG = PhotoImage(file = data + "images/Login.png")
+        self.LoginButtonBG = PhotoImage(file = f"{dataPath}/images/Login.png")
         self.login_button = Button(self, image = self.LoginButtonBG, borderwidth = 0, command = self.login_account)
 
-        self.BackAuthButtonBG = PhotoImage(file = data + "images/Back_Account.png")
+        self.BackAuthButtonBG = PhotoImage(file = f"{dataPath}/images/Back_Account.png")
         self.back_auth_button = Button(self, image = self.BackAuthButtonBG, borderwidth = 0, command = self.back_auth)
 
-        self.LoginAuthText = Image.open(data + "images/LoginAuth.png")
+        self.LoginAuthText = Image.open(f"{dataPath}/images/LoginAuth.png")
         self.LoginAuth = ImageTk.PhotoImage(self.LoginAuthText)
         self.login_auth = Label(image = self.LoginAuth, borderwidth = 0)
 
-        self.CreateAccText = Image.open(data + "images/CreateAcc.png")
+        self.CreateAccText = Image.open(f"{dataPath}/images/CreateAcc.png")
         self.CreateAcc = ImageTk.PhotoImage(self.CreateAccText)
         self.create_acc = Label(image = self.CreateAcc, borderwidth = 0)
 
@@ -151,15 +151,15 @@ class AceMath(Tk):
         self.login_success = Label(self, anchor = "c", justify = "left", font = ("Comic Sans MS", 32))
 
         #--[Sync Dialog]----------------------------------------------------------
-        self.SyncPromptText = Image.open(data + "images/SyncPromptMsg.png")
+        self.SyncPromptText = Image.open(f"{dataPath}/images/SyncPromptMsg.png")
         self.SyncPrompt = ImageTk.PhotoImage(self.SyncPromptText)
         self.sync_prompt = Label(image = self.SyncPrompt, borderwidth = 0)
 
-        self.GoToSyncBG = PhotoImage(file = data + "images/SyncContinue.png")
+        self.GoToSyncBG = PhotoImage(file = f"{dataPath}/images/SyncContinue.png")
         self.go_to_sync = Button(self, image = self.GoToSyncBG, borderwidth = 0, command = self.sync)
 
         #--[Logout Dialog]--------------------------------------------------------
-        self.LogoutPromptText = Image.open(data + "images/LogoutPrompt.png")
+        self.LogoutPromptText = Image.open(f"{dataPath}/images/LogoutPrompt.png")
         self.LogoutPrompt = ImageTk.PhotoImage(self.LogoutPromptText)
         self.logout_prompt = Label(image = self.LogoutPrompt, borderwidth = 0)
 
@@ -167,15 +167,15 @@ class AceMath(Tk):
         self.cancel_logout_button = Button(self, image = self.ExitNoButtonBG, borderwidth = 0, command = self.to_main_menu)
 
         #--[Not Logged in Error Dialog]-------------------------------------------
-        self.NoSyncText = Image.open(data + "images/NoSync.png")
+        self.NoSyncText = Image.open(f"{dataPath}/images/NoSync.png")
         self.NoSync = ImageTk.PhotoImage(self.NoSyncText)
         self.no_sync = Label(image = self.NoSync, borderwidth = 0)
 
-        self.OkButtonBG = PhotoImage(file = data + "images/Ok.png")
+        self.OkButtonBG = PhotoImage(file = f"{dataPath}/images/Ok.png")
         self.ok_button = Button(self, image = self.OkButtonBG, borderwidth = 0, command = self.login_affirm)
 
         #--[User Profile Page]----------------------------------------------------
-        self.DiagBoxBG = Image.open(data + "images/DiagBox.png")
+        self.DiagBoxBG = Image.open(f"{dataPath}/images/DiagBox.png")
         self.DiagBox = ImageTk.PhotoImage(self.DiagBoxBG)
         self.diag_box = Label(image = self.DiagBox, borderwidth = 0)
 
@@ -183,43 +183,43 @@ class AceMath(Tk):
         self.profile_stat = Label(self, justify = "right", text = "Times Played : \nEasy : \nNormal : \nHard : \n Expert : ", font = ("Comic Sans MS", 28))
         self.profile_stat_game = Label(self, justify = "left", font = ("Comic Sans MS", 28))
 
-        self.MaleProfilePicBG = Image.open(data + "images/Male.png")
+        self.MaleProfilePicBG = Image.open(f"{dataPath}/images/Male.png")
         self.MaleProfilePic = ImageTk.PhotoImage(self.MaleProfilePicBG)
         self.male_profile_pic = Label(image = self.MaleProfilePic, borderwidth = 0)
 
-        self.FemaleProfilePicBG = Image.open(data + "images/Female.png")
+        self.FemaleProfilePicBG = Image.open(f"{dataPath}/images/Female.png")
         self.FemaleProfilePic = ImageTk.PhotoImage(self.FemaleProfilePicBG)
         self.female_profile_pic = Label(image = self.FemaleProfilePic, borderwidth = 0)
 
-        self.ChangeGenderBG = PhotoImage(file = data + "images/Gender.png")
+        self.ChangeGenderBG = PhotoImage(file = f"{dataPath}/images/Gender.png")
         self.change_gender_button = Button(self, image = self.ChangeGenderBG, borderwidth = 0, command = self.change_gender)
 
         #--[Leaderboard Page]-----------------------------------------------------
-        self.EasySmallBG = PhotoImage(file = data + "images/EasySmall.png")
+        self.EasySmallBG = PhotoImage(file = f"{dataPath}/images/EasySmall.png")
         self.easy_small_button = Button(self, image = self.EasySmallBG, borderwidth = 0, command = self.easy_board)
 
-        self.NormalSmallBG = PhotoImage(file = data + "images/NormalSmall.png")
+        self.NormalSmallBG = PhotoImage(file = f"{dataPath}/images/NormalSmall.png")
         self.normal_small_button = Button(self, image = self.NormalSmallBG, borderwidth = 0, command = self.normal_board)
 
-        self.HardSmallBG = PhotoImage(file = data + "images/HardSmall.png")
+        self.HardSmallBG = PhotoImage(file = f"{dataPath}/images/HardSmall.png")
         self.hard_small_button = Button(self, image = self.HardSmallBG, borderwidth = 0, command = self.hard_board)
 
-        self.ExpertSmallBG = PhotoImage(file = data + "images/ExpertSmall.png")
+        self.ExpertSmallBG = PhotoImage(file = f"{dataPath}/images/ExpertSmall.png")
         self.expert_small_button = Button(self, image = self.ExpertSmallBG, borderwidth = 0, command = self.expert_board)
         
-        self.EasyLeaderboardBG = Image.open(data + "images/EasyLeaderboard.png")
+        self.EasyLeaderboardBG = Image.open(f"{dataPath}/images/EasyLeaderboard.png")
         self.EasyLeaderboard = ImageTk.PhotoImage(self.EasyLeaderboardBG)
         self.easy_leaderboard = Label(image = self.EasyLeaderboard, borderwidth = 0)
 
-        self.NormalLeaderboardBG = Image.open(data + "images/NormalLeaderboard.png")
+        self.NormalLeaderboardBG = Image.open(f"{dataPath}/images/NormalLeaderboard.png")
         self.NormalLeaderboard = ImageTk.PhotoImage(self.NormalLeaderboardBG)
         self.normal_leaderboard = Label(image = self.NormalLeaderboard, borderwidth = 0)
 
-        self.HardLeaderboardBG = Image.open(data + "images/HardLeaderboard.png")
+        self.HardLeaderboardBG = Image.open(f"{dataPath}/images/HardLeaderboard.png")
         self.HardLeaderboard = ImageTk.PhotoImage(self.HardLeaderboardBG)
         self.hard_leaderboard = Label(image = self.HardLeaderboard, borderwidth = 0)
 
-        self.ExpertLeaderboardBG = Image.open(data + "images/ExpertLeaderboard.png")
+        self.ExpertLeaderboardBG = Image.open(f"{dataPath}/images/ExpertLeaderboard.png")
         self.ExpertLeaderboard = ImageTk.PhotoImage(self.ExpertLeaderboardBG)
         self.expert_leaderboard = Label(image = self.ExpertLeaderboard, borderwidth = 0)
 
@@ -227,20 +227,20 @@ class AceMath(Tk):
         self.leaderboardTime = Label(self, justify = "left", font = ("Comic Sans MS", 28))
 
         #--[Difficulty Selection Page]--------------------------------------------
-        self.SelectDifficultyBG = Image.open(data + "images/SelectDifficulty.png")
+        self.SelectDifficultyBG = Image.open(f"{dataPath}/images/SelectDifficulty.png")
         self.SelectDifficulty = ImageTk.PhotoImage(self.SelectDifficultyBG)
         self.select_difficulty = Label(image = self.SelectDifficulty, borderwidth = 0)
 
-        self.EasyDifficultyBG = PhotoImage(file = data + "images/Easy.png")
+        self.EasyDifficultyBG = PhotoImage(file = f"{dataPath}/images/Easy.png")
         self.easy_difficulty_button = Button(self, image = self.EasyDifficultyBG, borderwidth = 0, command = lambda: self.difficulty_config("Easy", 19, 0, 9))
 
-        self.NormalDifficultyBG = PhotoImage(file = data + "images/Normal.png")
+        self.NormalDifficultyBG = PhotoImage(file = f"{dataPath}/images/Normal.png")
         self.normal_difficulty_button = Button(self, image = self.NormalDifficultyBG, borderwidth = 0, command = lambda: self.difficulty_config("Normal", 19, 10, 99))
 
-        self.HardDifficultyBG = PhotoImage(file = data + "images/Hard.png")
+        self.HardDifficultyBG = PhotoImage(file = f"{dataPath}/images/Hard.png")
         self.hard_difficulty_button = Button(self, image = self.HardDifficultyBG, borderwidth = 0, command = lambda: self.difficulty_config("Hard", 19, 100, 999))
 
-        self.ExpertDifficultyBG = PhotoImage(file = data + "images/Expert.png")
+        self.ExpertDifficultyBG = PhotoImage(file = f"{dataPath}/images/Expert.png")
         self.expert_difficulty_button = Button(self, image = self.ExpertDifficultyBG, borderwidth = 0, command = lambda: self.difficulty_config("Expert", 19, 1000, 9999))
 
         #--[Pre-Countdown Text]---------------------------------------------------
@@ -254,18 +254,18 @@ class AceMath(Tk):
         self.user_answer.bind("<Key>", self.check_answer)
 
         #--[Cancel Ongoing Game Dialog]-------------------------------------------
-        self.CancelGameBG = Image.open(data + "images/CancelGame.png")
+        self.CancelGameBG = Image.open(f"{dataPath}/images/CancelGame.png")
         self.CancelGame = ImageTk.PhotoImage(self.CancelGameBG)
         self.cancel_game = Label(image = self.CancelGame, borderwidth = 0)
 
-        self.CancelGameYes = PhotoImage(file = data + "images/Yes.png")
+        self.CancelGameYes = PhotoImage(file = f"{dataPath}/images/Yes.png")
         self.cancel_game_yes = Button(self, image = self.CancelGameYes, borderwidth = 0, command = self.prompt_exit)
 
-        self.CancelGameNo = PhotoImage(file = data + "images/No.png")
+        self.CancelGameNo = PhotoImage(file = f"{dataPath}/images/No.png")
         self.cancel_game_no = Button(self, image = self.CancelGameNo, borderwidth = 0, command = self.prompt_exit_cancel)
 
         #--[Result Affirm Button]-------------------------------------------------
-        self.FinishGame = PhotoImage(file = data + "images/Ok.png")
+        self.FinishGame = PhotoImage(file = f"{dataPath}/images/Ok.png")
         self.finish_game = Button(self, image = self.FinishGame, borderwidth = 0, command = self.ok_result)
 
     #-----------------------------------------------------------------------------
@@ -308,14 +308,14 @@ class AceMath(Tk):
         allUsername = list(allData.keys())
         scoreList = []
         for username in allUsername[:10]: # Limit to top 10 players
-            time = db.reference("Users/" + username + "/FastestTime/" + difficulty).get()
-            scoreList.append(float(time.removesuffix("s")))
+            time = db.reference(f"Users/{username}/FastestTime/{difficulty}Value").get()
+            scoreList.append(time)
         zipValue = zip(allUsername, scoreList)
         allScore = dict(zipValue)
         sortedLeaderboard = {}
         sortedLeaderboardKey = sorted(allScore, key = allScore.get)
         for value in sortedLeaderboardKey:
-            if allScore[value] != 0:
+            if allScore[value] != 0 and allScore[value] != 999999999:
                 sortedLeaderboard[value] = allScore[value]
             else:
                 continue
@@ -326,18 +326,18 @@ class AceMath(Tk):
         for key, value in sortedLeaderboard.items():
             key = (key[:length] + "...") if len(key) > length else key
             leaderboardNameList.insert(num, f"{num + 1:>2}. {key}")
-            leaderboardTimeList.insert(num, f"{value}s")
+            leaderboardTimeList.insert(num, f"{value:.3f}s")
             num += 1
         return leaderboardNameList, leaderboardTimeList
 
     #--[Get Amount of Times User Has Played]--------------------------------------
     def sum_times_played(self, user_name):
-        easy = db.reference("Users/" + str(user_name) + "/TimesPlayed/Easy").get()
-        normal = db.reference("Users/" + str(user_name) + "/TimesPlayed/Normal").get()
-        hard = db.reference("Users/" + str(user_name) + "/TimesPlayed/Hard").get()
-        expert = db.reference("Users/" + str(user_name) + "/TimesPlayed/Expert").get()
+        easy = db.reference(f"Users/{user_name}/TimesPlayed/Easy").get()
+        normal = db.reference(f"Users/{user_name}/TimesPlayed/Normal").get()
+        hard = db.reference(f"Users/{user_name}/TimesPlayed/Hard").get()
+        expert = db.reference(f"Users/{user_name}/TimesPlayed/Expert").get()
         sum_played = easy + normal + hard + expert
-        return str(sum_played)
+        return sum_played, easy, normal, hard, expert
 
     #-----------------------------------------------------------------------------
     # Accessing data.txt
@@ -346,21 +346,21 @@ class AceMath(Tk):
     def read_data(self, string_to_search):
         lineNumber = 0
         value = ""
-        with open(data + "data.txt", "r") as read_obj:
+        with open(f"{dataPath}/data.txt", "r") as read_obj:
             for line in read_obj:
                 lineNumber += 1
                 if string_to_search in line:
                     value = line.rstrip()
         read_obj.close()
-        return value.removeprefix(string_to_search + " = ")
+        return value.removeprefix(f"{string_to_search} = ")
 
     #--[Search and Replace Value in data.txt]-------------------------------------
     def write_data(self, string_to_search, value):
         lineNumber = 0
-        with open(data + "data.txt", "r") as read_obj:
+        with open(f"{dataPath}/data.txt", "r") as read_obj:
             filedata = read_obj.read()
-            filedata = filedata.replace(string_to_search + " = " + self.read_data(string_to_search), string_to_search + " = " + str(value))
-        with open(data + "data.txt", "w") as read_obj:
+            filedata = filedata.replace(f"{string_to_search} = {self.read_data(string_to_search)}", f"{string_to_search} = {str(value)}")
+        with open(f"{dataPath}/data.txt", "w") as read_obj:
             read_obj.write(filedata)
         read_obj.close()
 
@@ -512,18 +512,17 @@ class AceMath(Tk):
             name = self.read_data("firebaseUsername")
             name = (name[:length] + "...") if len(name) > length else name
             self.profile_name.config(text = name)
-            self.profile_stat_game.config(text = self.sum_times_played(self.read_data("firebaseUsername")) + "\n" + 
-                str(db.reference("Users/" + self.read_data("firebaseUsername") + "/TimesPlayed/Easy").get()) + " (Fastest : " + 
-                str(db.reference("Users/" + self.read_data("firebaseUsername") + "/FastestTime/Easy").get()) + ")" + "\n" +
-                
-                str(db.reference("Users/" + self.read_data("firebaseUsername") + "/TimesPlayed/Normal").get()) + " (Fastest : " + 
-                str(db.reference("Users/" + self.read_data("firebaseUsername") + "/FastestTime/Normal").get()) + ")" + "\n" +
-                
-                str(db.reference("Users/" + self.read_data("firebaseUsername") + "/TimesPlayed/Hard").get()) + " (Fastest : " + 
-                str(db.reference("Users/" + self.read_data("firebaseUsername") + "/FastestTime/Hard").get()) + ")" + "\n" +
-                
-                str(db.reference("Users/" + self.read_data("firebaseUsername") + "/TimesPlayed/Expert").get()) + " (Fastest : " + 
-                str(db.reference("Users/" + self.read_data("firebaseUsername") + "/FastestTime/Expert").get()) + ")" + "\n")
+            easyTime = db.reference("Users/" + self.read_data("firebaseUsername") + "/FastestTime/EasyValue").get()
+            normalTime = db.reference("Users/" + self.read_data("firebaseUsername") + "/FastestTime/NormalValue").get()
+            hardTime = db.reference("Users/" + self.read_data("firebaseUsername") + "/FastestTime/HardValue").get()
+            expertTime = db.reference("Users/" + self.read_data("firebaseUsername") + "/FastestTime/ExpertValue").get()
+            easyTime = "N/A" if easyTime == 999999999 else str(round(easyTime, 3)) + "s"
+            normalTime = "N/A" if normalTime == 999999999 else str(round(normalTime, 3)) + "s"
+            hardTime = "N/A" if hardTime == 999999999 else str(round(hardTime, 3)) + "s"
+            expertTime = "N/A" if expertTime == 999999999 else str(round(expertTime, 3)) + "s"
+            sumPlayed, easyPlayed, normalPlayed, hardPlayed, expertPlayed = self.sum_times_played(self.read_data("firebaseUsername"))
+            self.profile_stat_game.config(text = f"{sumPlayed}\n{easyPlayed} (Fastest : {easyTime})\n{normalPlayed} (Fastest : {normalTime})\n" + 
+                                                f"{hardPlayed} (Fastest : {hardTime})\n{expertPlayed} (Fastest : {expertTime})")
             if str(db.reference("Users/" + self.read_data("firebaseUsername") + "/Gender").get()) == "0":
                 self.show_widget(self.male_profile_pic, 300, 300)
             else:
@@ -678,7 +677,7 @@ class AceMath(Tk):
                         self.cancel_game_yes, self.cancel_game_no]
         for widget in hideWidgetList:
             self.hide_widget(widget)
-        winsound.PlaySound(data + "sounds/BGMusic.wav", winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
+        self.BGMusic()
         self.reinitialize()
         self.to_main_menu()
 
@@ -704,7 +703,7 @@ class AceMath(Tk):
         while t >= 0:
             if self.read_data("isStopwatchPaused") == "False":
                 self.after(1000)
-                self.pre_countdown.config(text = f"Game will start in {str(t)} seconds!\nPress 'ENTER' to submit answer", fg = "black")
+                self.pre_countdown.config(text = f"Game will start in {t} seconds!\nPress 'ENTER' to submit answer", fg = "black")
                 t -= 1
             self.update()  # Prevent Tkinter from locking up
         if self.read_data("isStopwatchPaused") == "False":
@@ -733,7 +732,7 @@ class AceMath(Tk):
                 self.show_widget(showWidgetList[widget][0], showWidgetList[widget][1], showWidgetList[widget][2])
             self.user_answer.focus()
             int1, int2 = random.randint(minInteger, maxInteger), random.randint(minInteger, maxInteger)
-            self.rand_int_text.config(text = str(int1) + " + " + str(int2))
+            self.rand_int_text.config(text = f"{int1} + {int2}")
             self.write_data("answer", int1 + int2)
             self.pre_countdown.config(text = str(int(self.read_data("currentQuestionNumber")) + 1) + "/" + str(questionSize + 1), anchor = "e")
         else:  # Game finishes
@@ -749,7 +748,7 @@ class AceMath(Tk):
                 self.submit_score() 
             else:
                 self.show_widget(self.pre_countdown, 500, 450)
-                self.pre_countdown.config(text = f"Your time is {str(self.stopwatch)}\nSign in to save your record!")
+                self.pre_countdown.config(text = f"Your time is {self.stopwatch.duration:.3f}s\nSign in to save your record!")
             self.reinitialize()
             
     #--[Check Answer]-------------------------------------------------------------
@@ -781,7 +780,7 @@ class AceMath(Tk):
         hideWidgetList = [self.diag_box, self.pre_countdown, self.finish_game]
         for widget in hideWidgetList:
             self.hide_widget(widget)
-        winsound.PlaySound(data + "sounds/BGMusic.wav", winsound.SND_ALIAS | winsound.SND_ASYNC | winsound.SND_LOOP)
+        self.BGMusic()
         self.to_main_menu()
     
     #--[Reinitialize data.txt]----------------------------------------------------
